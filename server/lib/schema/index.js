@@ -3,7 +3,7 @@ import { resolvers } from "../resolvers";
 
 // Define types
 const typeDefs = `
-  type Question {
+  type Metric {
     id: ID! 
   }
 
