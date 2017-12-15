@@ -16,7 +16,7 @@ module.exports = {
           key: "id"
         }
       },
-      middle: {
+      mean: {
         type: Sequelize.FLOAT
       },
       createdAt: {

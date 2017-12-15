@@ -1,4 +1,6 @@
 'use strict';
+const Sequelize = require('sequelize')
+
 module.exports = (sequelize, DataTypes) => {
   var AggregatedMeasurement = sequelize.define('AggregatedMeasurement', {
     id: {
@@ -7,10 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    middle: DataTypes.FLOAT
+    mean: DataTypes.FLOAT
   });
-  Measurement.associate = function (models) {
-    Measurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
+  AggregatedMeasurement.associate = function (models) {
+    AggregatedMeasurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
   }
   return AggregatedMeasurement;
 };

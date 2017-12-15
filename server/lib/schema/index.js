@@ -5,11 +5,34 @@ import { resolvers } from "../resolvers";
 const typeDefs = `
   type Metric {
     id: ID! 
+    name: String
+  }
+
+  type Measurement {
+    id: ID! 
+    metricId: ID!
+    mean: Float 
+  }
+
+  type AggregatedMeasurement {
+    id: ID! 
+    metricId: ID!
+    mean: Float 
   }
 
   type Query {
-    Question(id: ID): Question
-    Questions: [Question]
+    metric(id: ID): Metric
+    metrics: [Metric]
+    measurement(id: ID): Measurement
+    measurement: [Measurement]
+    aggregatedMeasurement(id: ID): Measurement
+    AggregatedMeasurement: [Measurement]
+  }
+
+  type Mutation {
+    createMetric(name: String!): Metric
+    createMeasurement(metricId: ID!, mean: Float): Measurement 
+    createAggregatedMeasurement(metricId: ID!, mean: Float): AggregatedMeasurement 
   }
 `;
 
