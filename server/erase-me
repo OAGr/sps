@@ -1,0 +1,6 @@
+PORT=8090
+#PROVIDER_URL=https://ropsten.infura.io:dYWKKqsJkbv9cZlQFEpI
+#SECRET_KEY=0x62543b4c00ede77bd7913dafbd7a1bf1b3f5ba7f155129170cebe9f52a0911d1
+
+PROVIDER_URL=http://localhost:8545
+SECRET_KEY=be09c029cd4df00d6a6ab909807ff00e26bd9eb510db10d2465f78cb5dec4b29

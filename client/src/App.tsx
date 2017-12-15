@@ -3,6 +3,7 @@ import { BrowserRouter, Route } from "react-router-dom";
 import ApolloClient, { createNetworkInterface } from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { createStore, combineReducers } from "redux";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -22,7 +23,7 @@ const store = createStore(
 export class Layout extends React.Component {
   public render() {
     return (
-      <div className="app-container">
+      <div className="container">
         <div className="app-content">{this.props.children}</div>
       </div>
     );
@@ -38,6 +39,7 @@ const LandingPage = () => (
 const Routes = () => (
   <div>
     <Route exact={true} path="/" component={LandingPage} />
+    <Route exact={true} path="/questions:questionId" component={LandingPage} />
   </div>
 );
 
