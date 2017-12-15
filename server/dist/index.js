@@ -16,7 +16,7 @@ var _schema2 = _interopRequireDefault(_schema);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-var GRAPHQL_PORT = 8080;
+var GRAPHQL_PORT = process.env.PORT || 8080;
 
 var graphQLServer = (0, _express2.default)();
 
