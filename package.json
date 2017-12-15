@@ -4,7 +4,9 @@
   "description": "Simple prediction service",
   "main": "index.js",
   "scripts": {
-    "postinstall": "cd server; npm install; cd .."
+    "server/install": "cd server && npm install && cd ..",
+    "server/serve": "cd server && npm run serve && cd ..",
+    "postinstall": "npm run server/install"
   },
   "author": "",
   "license": "MIT"
