@@ -6,12 +6,14 @@ const typeDefs = `
   type Metric {
     id: ID! 
     name: String
+    measurements: [Measurement]
   }
 
   type Measurement {
     id: ID! 
     metricId: ID!
     mean: Float 
+    metric: Metric
   }
 
   type AggregatedMeasurement {
@@ -24,9 +26,9 @@ const typeDefs = `
     metric(id: ID): Metric
     metrics: [Metric]
     measurement(id: ID): Measurement
-    measurement: [Measurement]
+    measurements: [Measurement]
     aggregatedMeasurement(id: ID): Measurement
-    AggregatedMeasurement: [Measurement]
+    aggregatedMeasurements: [Measurement]
   }
 
   type Mutation {
