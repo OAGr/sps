@@ -15,6 +15,14 @@ module.exports = {
           key: "id"
         }
       },
+      userId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: "Users",
+          key: "id"
+        }
+      },
       mean: {
         type: Sequelize.FLOAT
       },

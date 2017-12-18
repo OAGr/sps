@@ -17,6 +17,8 @@ module.exports = (sequelize, DataTypes) => {
   });
   Measurement.associate = function (models) {
     Measurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
+    Measurement.belongsTo(models.User, {foreignKey: 'userId'})
+    Measurement.User = Measurement.belongsTo(models.User, {foreignKey: 'userId'})
   }
   return Measurement;
 };

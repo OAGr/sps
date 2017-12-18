@@ -10,8 +10,14 @@ query {
   metrics {
    id 
    name
+   user {
+     name
+   }
    measurements {
      mean
+     user {
+       name
+     }
    }
    aggregatedMeasurements {
      mean
@@ -122,8 +128,8 @@ const QuestionPagePresentational = (props) => {
         <tbody>
           {(props.metrics.metrics && props.metrics.metrics.map((metric) => (
             <tr key={metric.id}>
-              <td>{metric.name}</td>
-              <td>{metric.measurements.map((m) => (`${m.mean},`))}</td>
+              <td>{metric.name}-{metric.user.name}</td>
+              <td>{metric.measurements.map((m) => (`${m.mean}-${m.user.name},`))}</td>
               <td>{metric.aggregatedMeasurements.map((m) => (`${m.mean},`))}</td>
               <td><MeasurementForm onSubmit={props.createMeasurement} metricId={metric.id}/></td>
             </tr>
