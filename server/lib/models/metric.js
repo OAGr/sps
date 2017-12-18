@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
     Metric.hasMany(models.Measurement, { foreignKey: 'metricId' })
     Metric.Measurements = Metric.hasMany(models.Measurement, { foreignKey: 'metricId', as: 'measurements' })
     Metric.hasMany(models.AggregatedMeasurement, { foreignKey: 'metricId' })
+    Metric.AggregatedMeasurements = Metric.hasMany(models.AggregatedMeasurement, { foreignKey: 'metricId', as: 'aggregatedMeasurements' })
   }
   return Metric;
 };

@@ -13,6 +13,9 @@ query {
    measurements {
      mean
    }
+   aggregatedMeasurements {
+     mean
+   }
   }
 }
 `;
@@ -111,7 +114,6 @@ const QuestionPagePresentational = (props) => {
        <Table striped={true} bordered={true} condensed={true} hover={true}>
         <thead>
           <tr>
-            <th>#</th>
             <th>Name</th>
             <th>Measurements</th>
             <th>Estimate</th>
@@ -120,10 +122,9 @@ const QuestionPagePresentational = (props) => {
         <tbody>
           {(props.metrics.metrics && props.metrics.metrics.map((metric) => (
             <tr key={metric.id}>
-              <td>{metric.id}</td>
               <td>{metric.name}</td>
               <td>{metric.measurements.map((m) => (`${m.mean},`))}</td>
-              <td>{metric.measurements.map((m) => (`${m.mean},`))}</td>
+              <td>{metric.aggregatedMeasurements.map((m) => (`${m.mean},`))}</td>
               <td><MeasurementForm onSubmit={props.createMeasurement} metricId={metric.id}/></td>
             </tr>
           )))}

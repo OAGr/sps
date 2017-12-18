@@ -4,9 +4,8 @@ module.exports = {
     return queryInterface.createTable('AggregatedMeasurements', {
       id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER
+        type: Sequelize.UUID
       },
       metricId: {
         allowNull: false,

@@ -1,13 +1,19 @@
 var models = require('../models');
-import {resolver, attributeFields} from 'graphql-sequelize';
-import {GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString} from 'graphql';
-import {_} from 'underscore';
+import * as _ from 'lodash';
+import { resolver, attributeFields } from 'graphql-sequelize';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString } from 'graphql';
 import { GraphQLBoolean } from 'graphql/type/scalars';
 
 let measurementType = new GraphQLObjectType({
-    name: 'Measurement',
-    description: 'A measurement',
-    fields: attributeFields(models.Measurement)
+  name: 'Measurement',
+  description: 'A measurement',
+  fields: attributeFields(models.Measurement)
+});
+
+let aggregatedMeasurementType = new GraphQLObjectType({
+  name: 'AggregatedMeasurement',
+  description: 'A aggravated measurement',
+  fields: attributeFields(models.AggregatedMeasurement)
 });
 
 let metricType = new GraphQLObjectType({
@@ -17,6 +23,12 @@ let metricType = new GraphQLObjectType({
     measurements: {
       type: new GraphQLList(measurementType),
       resolve: resolver(models.Metric.Measurements, {
+        separate: false
+      })
+    },
+    aggregatedMeasurements: {
+      type: new GraphQLList(aggregatedMeasurementType),
+      resolve: resolver(models.Metric.AggregatedMeasurements, {
         separate: false
       })
     }
@@ -63,8 +75,8 @@ let schema = new GraphQLSchema({
           }
         },
         description: 'Creates a new metric',
-        resolve: async (_, {name}) => {
-          return models.Metric.create({name})
+        resolve: async (__, { name }) => {
+          return models.Metric.create({ name })
         }
       },
       createMeasurement: {
@@ -80,8 +92,12 @@ let schema = new GraphQLSchema({
           }
         },
         description: 'Creates a new measurement',
-        resolve: async (_, {mean, metricId}) => {
-          return models.Measurement.create({mean, metricId})
+        resolve: async (__, { mean, metricId }) => {
+          const newMetric = await models.Measurement.create({ mean, metricId })
+          const existingMeasurements = await models.Measurement.findAll({where: {metricId}})
+          const aggregatedMean = _.meanBy(existingMeasurements, e => e.dataValues.mean);
+          const aggregated = await models.AggregatedMeasurement.create({ metricId, mean: aggregatedMean })
+          return newMetric
         }
       }
     }

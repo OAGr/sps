@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    metricId: {
+      type: DataTypes.UUID,
+      allowNull: false
+    },
     mean: DataTypes.FLOAT
   });
   AggregatedMeasurement.associate = function (models) {
