@@ -2,6 +2,7 @@ var models = require('../models');
 import {resolver, attributeFields} from 'graphql-sequelize';
 import {GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString} from 'graphql';
 import {_} from 'underscore';
+import { GraphQLBoolean } from 'graphql/type/scalars';
 
 let measurementType = new GraphQLObjectType({
     name: 'Measurement',
@@ -64,6 +65,23 @@ let schema = new GraphQLSchema({
         description: 'Creates a new metric',
         resolve: async (_, {name}) => {
           return models.Metric.create({name})
+        }
+      },
+      createMeasurement: {
+        type: measurementType,
+        args: {
+          mean: {
+            description: 'A measurement',
+            type: new GraphQLNonNull(GraphQLFloat)
+          },
+          metricId: {
+            description: 'A measurement',
+            type: new GraphQLNonNull(GraphQLString)
+          }
+        },
+        description: 'Creates a new measurement',
+        resolve: async (_, {mean, metricId}) => {
+          return models.Measurement.create({mean, metricId})
         }
       }
     }

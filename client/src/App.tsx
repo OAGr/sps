@@ -1,20 +1,21 @@
 import * as React from "react";
 import { BrowserRouter, Route } from "react-router-dom";
-import ApolloClient, { createNetworkInterface } from "apollo-client";
+import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
+import { HttpLink } from "apollo-link-http";
+import { InMemoryCache } from "apollo-cache-inmemory";
 import { createStore, combineReducers } from "redux";
 import { QuestionPage } from "./pages/QuestionPage";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
-const networkInterface = createNetworkInterface({ uri: "http://localhost:8080/graphql" });
 const reduxDevtoolsMiddleware: any =
   (window as any).__REDUX_DEVTOOLS_EXTENSION__ && (window as any).__REDUX_DEVTOOLS_EXTENSION__();
 
-const client = new ApolloClient({
-  networkInterface,
-  dataIdFromObject: (o: { id: string }) => o.id,
+const client: any = new ApolloClient({
+  link: new HttpLink({ uri: "http://localhost:8080/graphql" }),
+  cache: new InMemoryCache(),
 });
 
 const store = createStore(
@@ -47,7 +48,7 @@ const Routes = () => (
 class App extends React.Component {
   public render() {
     return (
-      <ApolloProvider store={store} client={client}>
+      <ApolloProvider client={client}>
         <BrowserRouter>
           <Layout>
             <Routes />
