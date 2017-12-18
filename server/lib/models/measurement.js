@@ -14,11 +14,17 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: false
     },
     mean: DataTypes.FLOAT
+  },{
+    hooks: {
+      afterCreate: async (measurement, options) => {
+        await sequelize.models.AggregatedMeasurement.create({ metricId: measurement.metricId, measurementId: measurement.id, mean: 30})
+      }
+    }
   });
   Measurement.associate = function (models) {
     Measurement.Metric = Measurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
     Measurement.User = Measurement.belongsTo(models.User, {foreignKey: 'userId'})
-    Measurement.AggregatedMeasurement = Measurement.hasOne(models.AggregatedMeasurement, { foreignKey: 'metricId', as: 'aggregatedMeasurement' })
+    Measurement.AggregatedMeasurement = Measurement.hasOne(models.AggregatedMeasurement, { foreignKey: 'measurementId', as: 'aggregatedMeasurement' })
   }
   return Measurement;
 };

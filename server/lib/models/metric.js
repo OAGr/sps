@@ -9,7 +9,10 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
-    name: DataTypes.STRING
+    name: DataTypes.STRING,
+    description: DataTypes.TEXT,
+    resolvesAt: DataTypes.DATE,
+    isArchived: DataTypes.BOOLEAN
   });
   Metric.associate = function (models) {
     Metric.Measurements = Metric.hasMany(models.Measurement, { foreignKey: 'metricId', as: 'measurements' })

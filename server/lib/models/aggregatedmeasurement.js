@@ -1,4 +1,5 @@
 'use strict';
+const _ = require('lodash');
 const Sequelize = require('sequelize')
 
 module.exports = (sequelize, DataTypes) => {
@@ -18,6 +19,14 @@ module.exports = (sequelize, DataTypes) => {
       allowNull: true 
     },
     mean: DataTypes.FLOAT
+  },{
+    hooks: {
+      beforeCreate: async (aggregatedMeasurement, options) => {
+        const metric = await aggregatedMeasurement.getMetric();
+        const measurements = await metric.getMeasurements();
+        aggregatedMeasurement.mean = _.meanBy(measurements, e => e.dataValues.mean);
+      }
+    }
   });
   AggregatedMeasurement.associate = function (models) {
     AggregatedMeasurement.Metric = AggregatedMeasurement.belongsTo(models.Metric, {foreignKey: 'metricId'})

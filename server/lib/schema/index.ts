@@ -10,24 +10,32 @@ let userType = new GraphQLObjectType({
   fields: attributeFields(models.User)
 });
 
+let aggregatedMeasurementType = new GraphQLObjectType({
+  name: 'AggregatedMeasurement',
+  description: 'A aggregated measurement',
+  fields: attributeFields(models.AggregatedMeasurement)
+});
+
 let measurementType = new GraphQLObjectType({
   name: 'Measurement',
   description: 'A measurement',
   fields: _.assign(attributeFields(models.Measurement), {
     user: {
       type: userType,
-      resolve: resolver(models.Metric.User, {
+      resolve: resolver(models.Measurement.User, {
+        separate: false
+      })
+    },
+    aggregatedMeasurement: {
+      type: aggregatedMeasurementType,
+      resolve: resolver(models.Measurement.AggregatedMeasurement, {
         separate: false
       })
     },
   })
 });
 
-let aggregatedMeasurementType = new GraphQLObjectType({
-  name: 'AggregatedMeasurement',
-  description: 'A aggregated measurement',
-  fields: attributeFields(models.AggregatedMeasurement)
-});
+const defaultUserId = "3aba1235-d5d6-4e52-b9c6-a0a95d1ee8ab";
 
 let metricType = new GraphQLObjectType({
   name: 'Metric',
@@ -91,12 +99,21 @@ let schema = new GraphQLSchema({
           name: {
             description: 'A name',
             type: new GraphQLNonNull(GraphQLString)
-          }
+          },
+          description: {
+            description: 'A name',
+            type: GraphQLString
+          },
+          resolvesAt: {
+            description: 'A name',
+            type: GraphQLString
+          },
         },
         description: 'Creates a new metric',
-        resolve: async (__, { name }) => {
-          // const user = await models.User.create({ name: "Ozzie", email: "df98a121-26ad-42ac-98c4-d9fca5d34d6a" })
-          return models.Metric.create({ name, userId: "df98a121-26ad-42ac-98c4-d9fca5d34d6a" })
+        resolve: async (__, { name, description }) => {
+          // const user = await models.User.create({ name: "george"})
+          console.log(name, description)
+          return models.Metric.create({ name, description, resolvesAt: '2030-08-09 04:05:02', userId: defaultUserId, isArchived: false })
         }
       },
       createMeasurement: {
@@ -113,10 +130,7 @@ let schema = new GraphQLSchema({
         },
         description: 'Creates a new measurement',
         resolve: async (__, { mean, metricId }) => {
-          const newMetric = await models.Measurement.create({ mean, metricId, userId: "78532f77-a1ec-45fd-8e00-51c881882253"  })
-          const existingMeasurements = await models.Measurement.findAll({where: {metricId}})
-          const aggregatedMean = _.meanBy(existingMeasurements, e => e.dataValues.mean);
-          const aggregated = await models.AggregatedMeasurement.create({ metricId, measurementId: newMetric.id, mean: aggregatedMean })
+          const newMetric = await models.Measurement.create({ mean, metricId, userId: defaultUserId  })
           return newMetric
         }
       }

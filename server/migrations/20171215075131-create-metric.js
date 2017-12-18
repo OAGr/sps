@@ -18,6 +18,18 @@ module.exports = {
       name: {
         type: Sequelize.STRING
       },
+      description: {
+        type: Sequelize.TEXT
+      },
+      resolvesAt: {
+        allowNull: true,
+        type: Sequelize.DATE
+      },
+      isArchived: {
+        defaultValue: false,
+        allowNull: false,
+        type: Sequelize.BOOLEAN
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
@@ -25,7 +37,11 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE
-      }
+      },
+      archivedAt: {
+        allowNull: true,
+        type: Sequelize.DATE
+      },
     });
   },
   down: (queryInterface, Sequelize) => {
