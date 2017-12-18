@@ -16,9 +16,9 @@ module.exports = (sequelize, DataTypes) => {
     mean: DataTypes.FLOAT
   });
   Measurement.associate = function (models) {
-    Measurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
-    Measurement.belongsTo(models.User, {foreignKey: 'userId'})
+    Measurement.Metric = Measurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
     Measurement.User = Measurement.belongsTo(models.User, {foreignKey: 'userId'})
+    Measurement.AggregatedMeasurement = Measurement.hasOne(models.AggregatedMeasurement, { foreignKey: 'metricId', as: 'aggregatedMeasurement' })
   }
   return Measurement;
 };

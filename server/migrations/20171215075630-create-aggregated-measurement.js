@@ -15,6 +15,14 @@ module.exports = {
           key: "id"
         }
       },
+      measurementId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        references: {
+          model: "Measurements",
+          key: "id"
+        }
+      },
       mean: {
         type: Sequelize.FLOAT
       },

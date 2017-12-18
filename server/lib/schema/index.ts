@@ -95,8 +95,8 @@ let schema = new GraphQLSchema({
         },
         description: 'Creates a new metric',
         resolve: async (__, { name }) => {
-          // const user = await models.User.create({ name: "Ozzie", email: "foo@bar.com" })
-          return models.Metric.create({ name, userId: "78532f77-a1ec-45fd-8e00-51c881882253" })
+          // const user = await models.User.create({ name: "Ozzie", email: "df98a121-26ad-42ac-98c4-d9fca5d34d6a" })
+          return models.Metric.create({ name, userId: "df98a121-26ad-42ac-98c4-d9fca5d34d6a" })
         }
       },
       createMeasurement: {
@@ -116,7 +116,7 @@ let schema = new GraphQLSchema({
           const newMetric = await models.Measurement.create({ mean, metricId, userId: "78532f77-a1ec-45fd-8e00-51c881882253"  })
           const existingMeasurements = await models.Measurement.findAll({where: {metricId}})
           const aggregatedMean = _.meanBy(existingMeasurements, e => e.dataValues.mean);
-          const aggregated = await models.AggregatedMeasurement.create({ metricId, mean: aggregatedMean })
+          const aggregated = await models.AggregatedMeasurement.create({ metricId, measurementId: newMetric.id, mean: aggregatedMean })
           return newMetric
         }
       }

@@ -12,9 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     name: DataTypes.STRING
   });
   User.associate = function (models) {
-    User.hasMany(models.Metric, { foreignKey: 'userId' })
     User.Metrics = User.hasMany(models.Metric, { foreignKey: 'userId', as: 'metrics' })
-    User.hasMany(models.Measurement, { foreignKey: 'userId' })
     User.Measurements = User.hasMany(models.Measurement, { foreignKey: 'userId', as: 'measurements' })
   }
   return User;

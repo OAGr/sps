@@ -13,10 +13,15 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false
     },
+    measurementId: {
+      type: DataTypes.UUID,
+      allowNull: true 
+    },
     mean: DataTypes.FLOAT
   });
   AggregatedMeasurement.associate = function (models) {
-    AggregatedMeasurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
+    AggregatedMeasurement.Metric = AggregatedMeasurement.belongsTo(models.Metric, {foreignKey: 'metricId'})
+    AggregatedMeasurement.Measurement = AggregatedMeasurement.belongsTo(models.Measurement, {foreignKey: 'measurementId'})
   }
   return AggregatedMeasurement;
 };
