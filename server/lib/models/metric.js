@@ -13,6 +13,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Metric.associate = function (models) {
     Metric.hasMany(models.Measurement, { foreignKey: 'metricId' })
+    Metric.Measurements = Metric.hasMany(models.Measurement, { foreignKey: 'metricId', as: 'measurements' })
     Metric.hasMany(models.AggregatedMeasurement, { foreignKey: 'metricId' })
   }
   return Metric;
