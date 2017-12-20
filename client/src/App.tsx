@@ -5,7 +5,8 @@ import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createStore, combineReducers } from "redux";
-import { QuestionPage } from "./pages/QuestionPage";
+import { MetricIndex } from "./pages/MetricIndex";
+import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const { SERVER_URL } = process.env;
@@ -25,7 +26,7 @@ const store = createStore(
 export class Layout extends React.Component {
   public render() {
     return (
-      <div className="container">
+      <div className="container-fluid">
         <div className="app-content">{this.props.children}</div>
       </div>
     );
@@ -40,8 +41,8 @@ const LandingPage = () => (
 
 const Routes = () => (
   <div>
-    <Route exact={true} path="/" component={QuestionPage} />
-    <Route exact={true} path="/questions:questionId" component={QuestionPage} />
+    <Route exact={true} path="/metrics" component={MetricIndex} />
+    <Route exact={true} path="/metrics/new" component={NewMetricForm} />
   </div>
 );
 

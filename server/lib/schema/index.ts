@@ -110,10 +110,8 @@ let schema = new GraphQLSchema({
           },
         },
         description: 'Creates a new metric',
-        resolve: async (__, { name, description }) => {
-          // const user = await models.User.create({ name: "george"})
-          console.log(name, description)
-          return models.Metric.create({ name, description, resolvesAt: '2030-08-09 04:05:02', userId: defaultUserId, isArchived: false })
+        resolve: async (__, { name, description, resolvesAt }) => {
+          return models.Metric.create({ name, description, resolvesAt, userId: defaultUserId, isArchived: false })
         }
       },
       createMeasurement: {

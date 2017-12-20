@@ -4,6 +4,9 @@ import gql from "graphql-tag";
 import { withRouter } from "react-router";
 import { compose } from "recompose";
 import { Table, FormControl } from "react-bootstrap";
+import DatePicker from "react-datepicker";
+import * as moment from "moment";
+import "react-datepicker/dist/react-datepicker.css";
 
 const QUESTION_QUERY = gql`
 query {
@@ -32,13 +35,16 @@ query {
 `;
 
 const CREATE_METRIC = gql`
-mutation createMetric($name: String!, $description: String!) {
-  createMetric(name: $name, description: $description){
+mutation createMetric($name: String!, $description: String!, $resolvesAt: String) {
+  createMetric(name: $name, description: $description, resolvesAt: $resolvesAt){
     id
     name
     description
     createdAt
     resolvesAt
+    user {
+      name
+    }
   }
 }
 `;
@@ -63,9 +69,10 @@ mutation createMeasurement($metricId: String!, $mean: Float!) {
 class MetricForm extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
-    this.state = { name: "", description: "", resolvesAt: "" };
+    this.state = { name: "", description: "", resolvesAt: moment() };
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.handleCalendarChange = this.handleCalendarChange.bind(this);
   }
 
   public handleChange(event: any, key: any) {
@@ -74,11 +81,15 @@ class MetricForm extends React.Component<any, any> {
     this.setState(newValues);
   }
 
+  public handleCalendarChange(resolvesAt: any) {
+    this.setState({resolvesAt});
+  }
+
   public handleSubmit(event: any) {
     // alert("A name was submitted: " + this.state.value);
-    console.log("SUMITTING:", { name: this.state.name, description: this.state.description });
+    const variables = { name: this.state.name, description: this.state.description, resolvesAt: this.state.resolvesAt.toISOString() };
     this.props.onSubmit({
-      variables: { name: this.state.name, description: this.state.description },
+      variables,
     });
     event.preventDefault();
   }
@@ -90,6 +101,7 @@ class MetricForm extends React.Component<any, any> {
           Name:
           <input type="text" value={this.state.name} onChange={(e) => {this.handleChange(e, "name"); }} />
           <input type="text" value={this.state.description} onChange={(e) => {this.handleChange(e, "description"); }} />
+          <DatePicker selected={this.state.resolvesAt} onChange={this.handleCalendarChange}/>
         </label>
         <input type="submit" value="Submit" />
       </form>
@@ -99,7 +111,7 @@ class MetricForm extends React.Component<any, any> {
 
 class MeasurementForm extends React.Component<any, any> {
   public constructor(props: any) {
-    super(props);
+    super(props); 
     this.state = { value: "" };
 
     this.handleChange = this.handleChange.bind(this);
@@ -111,9 +123,7 @@ class MeasurementForm extends React.Component<any, any> {
   }
 
   public handleSubmit(event: any) {
-    // alert("A name was submitted: " + this.state.value);
-    console.log("Submitting", this.state.value, this.props.metricId);
-    this.props.onSubmit({ variables: { mean: this.state.value, metricId: this.props.metricId } });
+    this.props.onSubmit({variables: {mean: this.state.value, metricId: this.props.metricId } });
     event.preventDefault();
   }
 
@@ -121,8 +131,7 @@ class MeasurementForm extends React.Component<any, any> {
     return (
       <form onSubmit={this.handleSubmit}>
         <label>
-          Name:
-          <input type="text" value={this.state.value} onChange={this.handleChange} />
+          <input type="text" value={this.state.value} onChange={this.handleChange} style={{width: "70px"}}/>
         </label>
         <input type="submit" value="Submit" />
       </form>
@@ -130,73 +139,60 @@ class MeasurementForm extends React.Component<any, any> {
   }
 }
 
-const QuestionPagePresentational = (props) => {
-  console.log(props.metrics);
+const DATE_FORMAT = "MMM Do YYYY";
+
+const MetricIndexPresentational = (props) => {
   return (
-    <div>
       <Table striped={true} bordered={true} condensed={true} hover={true}>
         <thead>
           <tr>
             <th>Name</th>
-            <th>Description</th>
-            <th>Created At</th>
-            <th>Measurements (person, estimate, aggregate)</th>
-            <th>Enter Data</th>
+            <th>Resolves At</th>
+            <th>Group Prediction</th>
+            <th>Your Estimate</th>
           </tr>
         </thead>
         <tbody>
           {(props.metrics.metrics && props.metrics.metrics.map((metric) => (
             <tr key={metric.id}>
-              <td>{metric.name}-{metric.user.name}</td>
-              <td>{metric.description}</td>
-              <td>{metric.createdAt}</td>
-              <td>{metric.resolvesAt}</td>
+              <td>{metric.name}</td>
+              <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
               <td>
-                <Table>
-                  <tbody>
-                    {metric.measurements.map((m) => (
-                    <tr key={m.id}>
-                      <td> {m.user.name} </td>
-                      <td> {m.mean} </td>
-                      <td> {m.aggregatedMeasurement && m.aggregatedMeasurement.mean} </td>
-                    </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                {metric.measurements[0] && metric.measurements[0].aggregatedMeasurement &&
+                    <div>{metric.measurements[0].aggregatedMeasurement.mean}</div>
+                }
               </td>
               <td><MeasurementForm onSubmit={props.createMeasurement} metricId={metric.id} /></td>
             </tr>
           )))}
         </tbody>
       </Table>
-      <MetricForm onSubmit={props.createMetric} />
-    </div>
   );
 };
 
 const createMetricOptions: any = {
-  update: (proxy, { data: { createMetric } }) => {
-    const data = proxy.readQuery({ query: QUESTION_QUERY });
-    data.metrics.push({ ...createMetric, measurements: [] });
-    proxy.writeQuery({ query: QUESTION_QUERY, data });
+  update: (proxy, {data:  {createMetric} }) => {
+    const data = proxy.readQuery({query:  QUESTION_QUERY });
+    data.metrics.push({...createMetric,  measurements: [] });
+    proxy.writeQuery({query:  QUESTION_QUERY, data });
   },
 };
 
 const createMeasurementOptions: any = {
-  update: (proxy, { data: { createMeasurement } }) => {
-    const data = proxy.readQuery({ query: QUESTION_QUERY });
+  update:  (proxy, {data:  {createMeasurement} }) => {
+    const data = proxy.readQuery({query:  QUESTION_QUERY });
     const metric: any = data.metrics.find((e) => e.id === createMeasurement.metricId);
     metric.measurements.push(createMeasurement);
-    proxy.writeQuery({ query: QUESTION_QUERY, data });
+    proxy.writeQuery({query:  QUESTION_QUERY, data });
   },
 };
 
-export const QuestionPage = compose(
+export const MetricIndex = compose(
   withRouter,
-  graphql(QUESTION_QUERY, { name: "metrics" }),
+  graphql(QUESTION_QUERY, {name:  "metrics" }),
   graphql(CREATE_METRIC, {
-    name: "createMetric",
+    name:  "createMetric",
     options: createMetricOptions,
   }),
-  graphql(CREATE_MEASUREMENT, { name: "createMeasurement", options: createMeasurementOptions }),
-  )(QuestionPagePresentational);
+  graphql(CREATE_MEASUREMENT, {name:   "createMeasurement", options: createMeasurementOptions }),
+  )(MetricIndexPresentational);
