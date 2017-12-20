@@ -1,6 +1,6 @@
 # sps
 
-Simple prediction service. 
+Simple prediction system. 
 
 Doesn't yet have user authentication. Aggregate predictions currently made as a simple average of all previous ones, instead of the most recent by each user.
 
