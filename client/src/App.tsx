@@ -8,6 +8,7 @@ import { createStore, combineReducers } from "redux";
 import { MetricIndex } from "./pages/MetricIndex";
 import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -23,10 +24,24 @@ const store = createStore(
   reduxDevtoolsMiddleware
 );
 
+const Header = () => (
+  <Navbar>
+  <Navbar.Header>
+    <Navbar.Brand>
+      <a href="/metrics/">Simple Prediction System</a>
+    </Navbar.Brand>
+  </Navbar.Header>
+  <Nav>
+    <NavItem eventKey={1} href="/metrics/new">New Metric</NavItem>
+  </Nav>
+</Navbar>
+);
+
 export class Layout extends React.Component {
   public render() {
     return (
       <div className="container-fluid">
+        <Header/>
         <div className="app-content">{this.props.children}</div>
       </div>
     );
