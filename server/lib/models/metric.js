@@ -19,6 +19,13 @@ module.exports = (sequelize, DataTypes) => {
     },
     name: {
       type: DataTypes.STRING,
+      get: async function() {
+        if (!!this.dataValues.name) { return this.dataValues.name } 
+        const p = await this.getProperty()
+        const pName = await p.name;
+        const e = await p.getEntity()
+        return `${e.name}-${pName}`
+      }
     },
     description: DataTypes.TEXT,
     resolvesAt: DataTypes.DATE,

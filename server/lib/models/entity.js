@@ -20,7 +20,7 @@ module.exports = (sequelize, DataTypes) => {
   });
   Entity.associate = function (models) {
     Entity.Categories = Entity.belongsToMany(models.Category, {through: 'EntityCategory', foreignKey: 'entityId'})
-    // Category.AbstractProperties = Category.hasMany(models.AbstractProperties, {foreignKey: 'categoryId', as: 'abstractProperties'})
+    Entity.Properties = Entity.hasMany(models.Property, {as: 'properties', foreignKey: 'entityId'})
   }
   return Entity;
 };

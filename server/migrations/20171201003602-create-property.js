@@ -11,7 +11,7 @@ module.exports = {
         type: Sequelize.UUID
       },
       entityId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.UUID,
         references: {
           model: "Entities",
@@ -33,6 +33,9 @@ module.exports = {
           model: "Properties",
           key: "id"
         }
+      },
+      name: {
+        type: Sequelize.STRING
       },
       isAbstract: {
         type: Sequelize.BOOLEAN
