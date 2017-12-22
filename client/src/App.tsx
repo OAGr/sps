@@ -5,6 +5,8 @@ import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { createStore, combineReducers } from "redux";
+import { EntityIndex } from "./pages/EntityIndex";
+import { EntityShow } from "./pages/EntityShow";
 import { MetricIndex } from "./pages/MetricIndex";
 import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -33,6 +35,7 @@ const Header = () => (
   </Navbar.Header>
   <Nav>
     <NavItem eventKey={1} href="/metrics/new">New Metric</NavItem>
+    <NavItem eventKey={2} href="/entities">Entities</NavItem>
   </Nav>
 </Navbar>
 );
@@ -56,6 +59,8 @@ const LandingPage = () => (
 
 const Routes = () => (
   <div>
+    <Route exact={true} path="/entities" component={EntityIndex} />
+    <Route exact={true} path="/entities/:entityId" component={EntityShow} />
     <Route exact={true} path="/metrics" component={MetricIndex} />
     <Route exact={true} path="/metrics/new" component={NewMetricForm} />
   </div>

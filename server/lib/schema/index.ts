@@ -58,7 +58,7 @@ let propertyType = makeObjectType(models.Property, [
   ['abstractProperty', () => propertyType, 'AbstractProperty'],
 ])
 
-const defaultUserId = "3aba1235-d5d6-4e52-b9c6-a0a95d1ee8ab";
+const defaultUserId = "edfa7c14-2b34-45c0-bad2-1c0b994dac11";
 // var i = 0;
 // setInterval(() => {
 //   var bar = models;
@@ -86,6 +86,11 @@ let schema = new GraphQLSchema({
       },
       entities: {
         type: new GraphQLList(entityType),
+        resolve: resolver(models.Entity)
+      },
+      entity: {
+        type: entityType,
+        args: _.pick(attributeFields(models.Entity), ['id']),
         resolve: resolver(models.Entity)
       },
       properties: {
