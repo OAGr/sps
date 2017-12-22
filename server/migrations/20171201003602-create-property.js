@@ -1,3 +1,6 @@
+// import db from "../models/index"
+var DataTypes = require("sequelize")
+
 'use strict';
 module.exports = {
   up: (queryInterface, Sequelize) => {
@@ -15,16 +18,30 @@ module.exports = {
           key: "id"
         }
       },
-      abstractPropertyId: {
+      categoryId: {
         allowNull: true,
         type: Sequelize.UUID,
         references: {
-          model: "AbstractProperties",
+          model: "Categories",
           key: "id"
         }
       },
-      value: {
-        type: Sequelize.STRING
+      abstractId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        references: {
+          model: "Properties",
+          key: "id"
+        }
+      },
+      isAbstract: {
+        type: Sequelize.BOOLEAN
+      },
+      resolvesAt: {
+        type: Sequelize.DataTypes.ARRAY(Sequelize.DATE)
+      },
+      type: {
+        type: Sequelize.ENUM(["EVENT", "PROJECTION", "PROBABILITY"])
       },
       createdAt: {
         allowNull: false,

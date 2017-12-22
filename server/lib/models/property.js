@@ -26,9 +26,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   Property.associate = function (models) {
-    Property.Entity = Property.belongsTo(models.AbstractProperty, { foreignKey: 'entityId', as: 'entity' })
-    Property.AbstractProperty = Property.belongsTo(models.AbstractProperty, { foreignKey: 'abstractPropertyId', as: 'abstractProperties' })
-    Property.Metrics = Property.hasMany(models.Metric, { foreignKey: 'propertyId', as: 'metrics' })
+    // Property.Entity = Property.belongsTo(models.AbstractProperty, { foreignKey: 'entityId', as: 'entity' })
+    // Property.AbstractProperty = Property.belongsTo(models.AbstractProperty, { foreignKey: 'abstractPropertyId', as: 'abstractProperties' })
+    // Property.Metrics = Property.hasMany(models.Metric, { foreignKey: 'propertyId', as: 'metrics' })
   }
   return Property;
 };

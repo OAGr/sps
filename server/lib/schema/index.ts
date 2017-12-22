@@ -4,63 +4,49 @@ import { resolver, attributeFields } from 'graphql-sequelize';
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString } from 'graphql';
 import { GraphQLBoolean } from 'graphql/type/scalars';
 
-let userType = new GraphQLObjectType({
-  name: 'User',
-  description: 'A user',
-  fields: attributeFields(models.User)
-});
-
-let aggregatedMeasurementType = new GraphQLObjectType({
-  name: 'AggregatedMeasurement',
-  description: 'A aggregated measurement',
-  fields: attributeFields(models.AggregatedMeasurement)
-});
-
-let measurementType = new GraphQLObjectType({
-  name: 'Measurement',
-  description: 'A measurement',
-  fields: _.assign(attributeFields(models.Measurement), {
-    user: {
-      type: userType,
-      resolve: resolver(models.Measurement.User, {
-        separate: false
-      })
-    },
-    aggregatedMeasurement: {
-      type: aggregatedMeasurementType,
-      resolve: resolver(models.Measurement.AggregatedMeasurement, {
-        separate: false
-      })
-    },
-  })
-});
-
-const defaultUserId = "3aba1235-d5d6-4e52-b9c6-a0a95d1ee8ab";
-
-let metricType = new GraphQLObjectType({
-  name: 'Metric',
-  description: 'A user',
-  fields: _.assign(attributeFields(models.Metric), {
-    user: {
-      type: userType,
-      resolve: resolver(models.Metric.User, {
-        separate: false
-      })
-    },
-    measurements: {
-      type: new GraphQLList(measurementType),
-      resolve: resolver(models.Metric.Measurements, {
-        separate: false
-      })
-    },
-    aggregatedMeasurements: {
-      type: new GraphQLList(aggregatedMeasurementType),
-      resolve: resolver(models.Metric.AggregatedMeasurements, {
-        separate: false
-      })
+const generateReferences = (model, references) => {
+  let all = {};
+  references.map(r => {
+    all[r[0]] = {
+      type: r[1](),
+      resolve: resolver(model[r[2]])
     }
   })
-});
+  return all
+}
+
+const makeObjectType = (model, references) => (
+  new GraphQLObjectType({
+    name: model.name,
+    description: model.name,
+    fields: () => _.assign(attributeFields(model), generateReferences(model, references))
+  })
+)
+
+let userType = makeObjectType(models.User,
+  [['metrics', () => metricType, 'Metrics']]
+)
+
+let aggregatedMeasurementType = makeObjectType(models.AggregatedMeasurement, [])
+
+let measurementType = makeObjectType(models.Measurement, [
+  ['user', () => userType, 'User'],
+  ['aggregatedMeasurement', () => aggregatedMeasurementType, 'AggregatedMeasurement']
+])
+
+let metricType = makeObjectType(models.Metric, [
+  ['user', () => userType, 'User'],
+  ['measurements', () => new GraphQLList(measurementType), 'Measurements'],
+  ['aggregatedMeasurements', () => new GraphQLList(aggregatedMeasurementType), 'AggregatedMeasurements']
+])
+
+const defaultUserId = "3aba1235-d5d6-4e52-b9c6-a0a95d1ee8ab";
+// var i = 0;
+// setInterval(() => {
+//   var bar = models;
+// 	console.log('hello world:' + i++);
+//   debugger;
+// }, 1000);
 
 let schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -68,24 +54,11 @@ let schema = new GraphQLSchema({
     fields: {
       metric: {
         type: metricType,
-        args: {
-          id: {
-            description: 'id of the user',
-            type: new GraphQLNonNull(GraphQLInt)
-          }
-        },
+        args: _.pick(attributeFields(models.Metric),['id']),
         resolve: resolver(models.Metric)
       },
       metrics: {
         type: new GraphQLList(metricType),
-        args: {
-          limit: {
-            type: GraphQLInt
-          },
-          order: {
-            type: GraphQLString
-          }
-        },
         resolve: resolver(models.Metric)
       }
     }
@@ -95,38 +68,14 @@ let schema = new GraphQLSchema({
     fields: {
       createMetric: {
         type: metricType,
-        args: {
-          name: {
-            description: 'A name',
-            type: new GraphQLNonNull(GraphQLString)
-          },
-          description: {
-            description: 'A name',
-            type: GraphQLString
-          },
-          resolvesAt: {
-            description: 'A name',
-            type: GraphQLString
-          },
-        },
-        description: 'Creates a new metric',
+        args: _.pick(attributeFields(models.Metric),['name', 'description', 'resolvesAt']),
         resolve: async (__, { name, description, resolvesAt }) => {
-          return models.Metric.create({ name, description, resolvesAt, userId: defaultUserId, isArchived: false })
+          return models.Metric.create({ name, description, resolvesAt, isArchived: false })
         }
       },
       createMeasurement: {
         type: measurementType,
-        args: {
-          mean: {
-            description: 'A measurement',
-            type: new GraphQLNonNull(GraphQLFloat)
-          },
-          metricId: {
-            description: 'A measurement',
-            type: new GraphQLNonNull(GraphQLString)
-          }
-        },
-        description: 'Creates a new measurement',
+        args: _.pick(attributeFields(models.Measurement),['mean', 'metricId']),
         resolve: async (__, { mean, metricId }) => {
           const newMetric = await models.Measurement.create({ mean, metricId, userId: defaultUserId  })
           return newMetric

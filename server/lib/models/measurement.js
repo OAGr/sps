@@ -13,7 +13,9 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false
     },
-    mean: DataTypes.FLOAT
+    mean: {
+      type: DataTypes.FLOAT,
+    }
   },{
     hooks: {
       afterCreate: async (measurement, options) => {

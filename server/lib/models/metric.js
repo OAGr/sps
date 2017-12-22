@@ -15,9 +15,11 @@ module.exports = (sequelize, DataTypes) => {
     },
     propertyId: {
       type: DataTypes.UUID(),
-      allowNull: false,
+      allowNull: true,
     },
-    name: DataTypes.STRING,
+    name: {
+      type: DataTypes.STRING,
+    },
     description: DataTypes.TEXT,
     resolvesAt: DataTypes.DATE,
     isArchived: DataTypes.BOOLEAN

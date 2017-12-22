@@ -1,5 +1,6 @@
 'use strict';
 const Sequelize = require('sequelize')
+import { resolver, attributeFields } from 'graphql-sequelize';
 
 module.exports = (sequelize, DataTypes) => {
   var Category = sequelize.define('Category', {
@@ -18,8 +19,9 @@ module.exports = (sequelize, DataTypes) => {
     }
   });
   Category.associate = function (models) {
+    console.log("HIHIHIHI", attributeFields(models.Category))
     Category.Entities = Category.belongsToMany(models.Entity, {through: 'EntityCategory', foreignKey: 'categoryId'})
-    Category.AbstractProperties = Category.hasMany(models.AbstractProperty, {as: 'abstractProperties', foreignKey: 'categoryId'})
+    // Category.AbstractProperties = Category.hasMany(models.AbstractProperty, {as: 'abstractProperties', foreignKey: 'categoryId'})
   }
   return Category;
 };

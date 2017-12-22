@@ -8,7 +8,7 @@ module.exports = {
         type: Sequelize.UUID
       },
       userId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.UUID,
         references: {
           model: "Users",
@@ -16,7 +16,7 @@ module.exports = {
         }
       },
       propertyId: {
-        allowNull: false,
+        allowNull: true,
         type: Sequelize.UUID,
         references: {
           model: "Properties",
@@ -28,6 +28,9 @@ module.exports = {
       },
       description: {
         type: Sequelize.TEXT
+      },
+      type: {
+        type: Sequelize.ENUM(["RESOLVES_AT", "HAPPENS_AT", "FAILURE_CHANCE", "PROBABILITY"])
       },
       resolvesAt: {
         allowNull: true,
