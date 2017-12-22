@@ -9,6 +9,14 @@ module.exports = (sequelize, DataTypes) => {
       defaultValue: Sequelize.UUIDV4,
       allowNull: false,
     },
+    userId: {
+      type: DataTypes.UUID(),
+      allowNull: true,
+    },
+    propertyId: {
+      type: DataTypes.UUID(),
+      allowNull: false,
+    },
     name: DataTypes.STRING,
     description: DataTypes.TEXT,
     resolvesAt: DataTypes.DATE,
@@ -18,6 +26,7 @@ module.exports = (sequelize, DataTypes) => {
     Metric.Measurements = Metric.hasMany(models.Measurement, { foreignKey: 'metricId', as: 'measurements' })
     Metric.AggregatedMeasurements = Metric.hasMany(models.AggregatedMeasurement, { foreignKey: 'metricId', as: 'aggregatedMeasurements' })
     Metric.User = Metric.belongsTo(models.User, {foreignKey: 'userId'})
+    Metric.Property = Metric.belongsTo(models.Property, {foreignKey: 'propertyId'})
   }
   return Metric;
 };

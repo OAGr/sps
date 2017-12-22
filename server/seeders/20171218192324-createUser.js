@@ -9,7 +9,7 @@ module.exports = {
 
       Example:
     */
-    // const user1 = await models.User.create({ name: "Sample User 1"})
+    const user1 = await models.User.create({ name: "Sample User 1"})
     // const user2 = await models.User.create({ name: "Sample User 2"})
     // const user3 = await models.User.create({ name: "Sample User 3"})
     // const user4 = await models.User.create({ name: "Sample User 4"})
@@ -24,8 +24,10 @@ module.exports = {
     // const measurement4 = await models.Measurement.create({metricId: metric2.id, userId: user1.id, mean: 100})
     // const measurement5 = await models.Measurement.create({metricId: metric2.id, userId: user2.id, mean: 200})
     // const measurement6 = await models.Measurement.create({metricId: metric2.id, userId: user3.id, mean: 300})
-    const c1 = await models.Category.create({name: "earnings"})
+    const c1 = await models.Category.create({name: "company"})
     const ap1 = await models.AbstractProperty.create({name:"revenue", categoryId: c1.id})
+    const ap1 = await models.AbstractProperty.create({name:"employee count", categoryId: c1.id})
+    const ap1 = await models.AbstractProperty.create({name:"", categoryId: c1.id})
     // const c2 = await models.Category.create({name: "employee count"})
     // const c3 = await models.Category.create({name: "something else..."})
     const e1 = await models.Entity.create({name:"Tesla"})

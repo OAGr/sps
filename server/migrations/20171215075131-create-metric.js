@@ -15,6 +15,14 @@ module.exports = {
           key: "id"
         }
       },
+      propertyId: {
+        allowNull: false,
+        type: Sequelize.UUID,
+        references: {
+          model: "Properties",
+          key: "id"
+        }
+      },
       name: {
         type: Sequelize.STRING
       },
