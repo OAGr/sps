@@ -6,6 +6,7 @@ import { compose } from "recompose";
 import { Table, FormControl, Row, Col, ToggleButtonGroup, ToggleButton } from "react-bootstrap";
 import * as moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
+import { MeasurementForm } from "./MeasurementForm";
 
 const ENTITY_QUERY = gql`
 query GetEntityQuery($id: String!){
@@ -50,35 +51,33 @@ const Property = ({ property }: any) => {
     return (
         <div>
             <h3> {property.name}</h3>
-            <h3> {property.metrics.map((m) => (<div>
-                {`${moment(m.resolvesAt).format(DATE_FORMAT)}`}
-            </div>))}</h3>
-      <Table striped={true} bordered={true} condensed={true} hover={true}>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Resolves At</th>
-            <th>Group Prediction</th>
-            <th>Your Estimate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(property.metrics && property.metrics.map((metric) => (
-            <tr key={metric.id}>
-              <td>{metric.name}</td>
-              <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
-              <td>
-                {metric.measurements[0] && metric.measurements[0].aggregatedMeasurement &&
-                    <div>{metric.measurements[0].aggregatedMeasurement.mean}</div>
-                }
-              </td>
-              {/* <td><MeasurementForm onSubmit={props.createMeasurement} metricId={metric.id} /></td> */}
-            </tr>
-          )))}
-        </tbody>
-      </Table>
+            <Table striped={true} bordered={true} condensed={true} hover={true}>
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Group Prediction</th>
+                        <th>Your Estimate</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {property.metrics && property.metrics.map((metric) => {
+                        const lastMeasurement = metric.measurements[metric.measurements.length - 1];
+                        return (
+                            <tr key={metric.id}>
+                                <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
+                                <td>
+                                    {lastMeasurement && lastMeasurement.aggregatedMeasurement &&
+                                        <div>{lastMeasurement.aggregatedMeasurement.mean}</div>
+                                    }
+                                </td>
+                                <td><MeasurementForm metricId={metric.id} /></td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </Table>
         </div>
-        );
+    );
 };
 
 class EntityShowPresentational extends React.Component<any, any> {

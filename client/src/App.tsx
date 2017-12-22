@@ -1,5 +1,5 @@
 import * as React from "react";
-import { BrowserRouter, Route } from "react-router-dom";
+import { BrowserRouter, Route, Link } from "react-router-dom";
 import ApolloClient from "apollo-client";
 import { ApolloProvider } from "react-apollo";
 import { HttpLink } from "apollo-link-http";
@@ -11,6 +11,7 @@ import { MetricIndex } from "./pages/MetricIndex";
 import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
+import { LinkContainer } from "react-router-bootstrap";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -30,12 +31,16 @@ const Header = () => (
   <Navbar>
   <Navbar.Header>
     <Navbar.Brand>
-      <a href="/metrics/">Simple Prediction System</a>
+      <Link to="/metrics/">Simple Prediction System</Link>
     </Navbar.Brand>
   </Navbar.Header>
   <Nav>
-    <NavItem eventKey={1} href="/metrics/new">New Metric</NavItem>
-    <NavItem eventKey={2} href="/entities">Entities</NavItem>
+    <LinkContainer to="/metrics/new">
+      <NavItem eventKey={1}>New Metric</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/entities">
+      <NavItem eventKey={2} href="/entities">Entities</NavItem>
+    </LinkContainer>
   </Nav>
 </Navbar>
 );
