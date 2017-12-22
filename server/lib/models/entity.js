@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
   Entity.associate = function (models) {
     Entity.Categories = Entity.belongsToMany(models.Category, {through: 'EntityCategory', foreignKey: 'entityId'})
     Entity.Properties = Entity.hasMany(models.Property, {as: 'properties', foreignKey: 'entityId'})
+    Entity.Metrics = Entity.hasMany(models.Metric, {as: 'metrics', foreignKey: 'entityId'})
   }
   return Entity;
 };

@@ -13,6 +13,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID(),
       allowNull: true,
     },
+    entityId: {
+      type: DataTypes.UUID,
+      allowNull: true 
+    },
     propertyId: {
       type: DataTypes.UUID(),
       allowNull: true,
@@ -36,6 +40,7 @@ module.exports = (sequelize, DataTypes) => {
     Metric.AggregatedMeasurements = Metric.hasMany(models.AggregatedMeasurement, { foreignKey: 'metricId', as: 'aggregatedMeasurements' })
     Metric.User = Metric.belongsTo(models.User, {foreignKey: 'userId'})
     Metric.Property = Metric.belongsTo(models.Property, {foreignKey: 'propertyId'})
+    Metric.Entity = Metric.belongsTo(models.Entity, {as: 'entity'})
   }
   return Metric;
 };

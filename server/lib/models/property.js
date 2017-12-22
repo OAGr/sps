@@ -55,7 +55,7 @@ module.exports = (sequelize, DataTypes) => {
   })
   Property.prototype.generateMetrics = async function(){
       const resolvesAt = await this.resolvesAt;
-      await Promise.all(resolvesAt.map(async (r) => {await this.createMetric({resolvesAt: r})}))
+      await Promise.all(resolvesAt.map(async (r) => {await this.createMetric({resolvesAt: r, entityId: this.entityId})}))
   }
   Property.afterCreate(p => {
     if (!p.isAbstract){

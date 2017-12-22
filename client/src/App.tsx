@@ -8,6 +8,7 @@ import { createStore, combineReducers } from "redux";
 import { EntityIndex } from "./pages/EntityIndex";
 import { EntityShow } from "./pages/EntityShow";
 import { MetricIndex } from "./pages/MetricIndex";
+import { MetricShow } from "./pages/MetricShow";
 import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
@@ -65,9 +66,10 @@ const LandingPage = () => (
 const Routes = () => (
   <div>
     <Route exact={true} path="/entities" component={EntityIndex} />
-    <Route exact={true} path="/entities/:entityId" component={EntityShow} />
+    <Route path="/entities/:entityId" component={EntityShow} />
     <Route exact={true} path="/metrics" component={MetricIndex} />
     <Route exact={true} path="/metrics/new" component={NewMetricForm} />
+    <Route path="/metrics/:metricId" component={MetricShow} />
   </div>
 );
 

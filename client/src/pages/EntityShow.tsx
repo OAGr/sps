@@ -7,6 +7,8 @@ import { Table, FormControl, Row, Col, ToggleButtonGroup, ToggleButton } from "r
 import * as moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 import { MeasurementForm } from "./MeasurementForm";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
+import { Link } from "react-router-dom";
 
 const ENTITY_QUERY = gql`
 query GetEntityQuery($id: String!){
@@ -24,6 +26,10 @@ query GetEntityQuery($id: String!){
             createdAt
             resolvesAt
             user {
+                name
+            }
+            entity {
+                id
                 name
             }
             measurements {
@@ -47,7 +53,22 @@ query GetEntityQuery($id: String!){
 
 const DATE_FORMAT = "YYYY";
 
+// const data = [
+//     { name: "Page A",  pv: 2400},
+//     { name: "Page B", pv: 1398},
+//     { name: "Page C", pv: 9800},
+// ];
+
 const Property = ({ property }: any) => {
+    const data = property.metrics.map((metric) => {
+        const lastMeasurement = metric.measurements[metric.measurements.length - 1];
+        let value;
+        value = lastMeasurement && lastMeasurement.aggregatedMeasurement && lastMeasurement.aggregatedMeasurement.mean || 0;
+        const name = `${moment(metric.resolvesAt).format(DATE_FORMAT)}`;
+        return {name, value};
+    });
+    console.log(data);
+
     return (
         <div>
             <h3> {property.name}</h3>
@@ -55,6 +76,7 @@ const Property = ({ property }: any) => {
                 <thead>
                     <tr>
                         <th>Year</th>
+                        <th>Entity</th>
                         <th>Group Prediction</th>
                         <th>Your Estimate</th>
                     </tr>
@@ -76,6 +98,14 @@ const Property = ({ property }: any) => {
                     })}
                 </tbody>
             </Table>
+            <LineChart width={600} height={300} data={data}
+                margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <XAxis dataKey="name" />
+                <YAxis />
+                <CartesianGrid strokeDasharray="3 3" />
+                <Tooltip />
+                <Line type="monotone" dataKey="value" stroke="#8884d8"/>
+            </LineChart>
         </div>
     );
 };
@@ -131,9 +161,9 @@ class EntityShowPresentational extends React.Component<any, any> {
     }
 }
 
-const options: any = {
-    name: "entities", variables: { id: "6765818d-905c-45ae-9ea2-5ccf161f11ef" },
-};
+const options: any = ({match}) => ({
+    variables: { id: match.params.entityId },
+});
 
 export const EntityShow = compose(
     withRouter,

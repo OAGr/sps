@@ -23,6 +23,14 @@ module.exports = {
           key: "id"
         }
       },
+      entityId: {
+        allowNull: true,
+        type: Sequelize.UUID,
+        references: {
+          model: "Entities",
+          key: "id"
+        }
+      },
       name: {
         type: Sequelize.STRING
       },

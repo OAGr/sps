@@ -36,6 +36,7 @@ let measurementType = makeObjectType(models.Measurement, [
 
 let metricType = makeObjectType(models.Metric, [
   ['user', () => userType, 'User'],
+  ['entity', () => entityType, 'Entity'],
   ['property', () => propertyType, 'Property'],
   ['measurements', () => new GraphQLList(measurementType), 'Measurements'],
   ['aggregatedMeasurements', () => new GraphQLList(aggregatedMeasurementType), 'AggregatedMeasurements']
@@ -44,6 +45,7 @@ let metricType = makeObjectType(models.Metric, [
 let entityType = makeObjectType(models.Entity, [
   ['categories', () => new GraphQLList(categoryType), 'Categories'],
   ['properties', () => new GraphQLList(propertyType), 'Properties'],
+  ['metrics', () => new GraphQLList(metricType), 'Metrics'],
 ])
 
 let categoryType = makeObjectType(models.Category, [

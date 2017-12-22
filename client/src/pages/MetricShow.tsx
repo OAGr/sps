@@ -11,26 +11,24 @@ import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 
 const QUESTION_QUERY = gql`
-query {
-  metrics {
+query GetMetricQuery($id: String!){
+   metric(id: $id){
    id 
    name
    description
    createdAt
    resolvesAt
-   user {
+   property {
+     id
      name
    }
    entity {
      id
      name
    }
-   property {
+   user {
+     id
      name
-     abstractProperty{
-       id
-       name
-     }
    }
    measurements {
     id
@@ -46,29 +44,28 @@ query {
   }
 }
 `;
-const DATE_FORMAT = "YYYY";
+const DATE_FORMAT = "MMM Do YYYY";
 
-const MetricIndexPresentational = (props) => {
+const MetricShowPresentational = (props) => {
+  const metric = props.metric.metric;
+  let lastMeasurement;
+  if (metric) {
+    lastMeasurement = metric.measurements[metric.measurements.length - 1];
+  }
   return (
       <Table striped={true} bordered={true} condensed={true} hover={true}>
         <thead>
           <tr>
-            <th>Metric Name</th>
-            <th>Entity</th>
-            <th>Property</th>
+            <th>Name</th>
             <th>Resolves At</th>
             <th>Group Prediction</th>
             <th>Your Estimate</th>
           </tr>
         </thead>
         <tbody>
-          {(props.metrics.metrics && props.metrics.metrics.map((metric) => {
-            const lastMeasurement = metric.measurements[metric.measurements.length - 1];
-            return (
-            <tr key={metric.id}>
-              <td><Link to={`/metrics/${metric.id}`}>{`${metric.entity.name}-${metric.property.name}-${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</Link></td>
-              <td><Link to={`/entities/${metric.entity.id}`}>{metric.entity.name}</Link></td>
-              <td><Link to={`/properties/${metric.property.abstractProperty.id}`}>{metric.property.abstractProperty.name}</Link></td>
+            {metric &&
+            <tr>
+              <td><Link to={`/entities/${metric.entity.id}`}>{metric.entity.name}</Link>--{metric.property.name}</td>
               <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
               <td>
                 {lastMeasurement && lastMeasurement.aggregatedMeasurement &&
@@ -77,15 +74,17 @@ const MetricIndexPresentational = (props) => {
               </td>
               <td><MeasurementForm metricId={metric.id} /></td>
             </tr>
-            );
-          }
-          ))}
+            }
         </tbody>
       </Table>
   );
 };
 
-export const MetricIndex = compose(
+const options: any = ({match}) => {
+    return {variables: { id: match.params.metricId }};
+ };
+
+export const MetricShow = compose(
   withRouter,
-  graphql(QUESTION_QUERY, {name:  "metrics" }),
-  )(MetricIndexPresentational);
+  graphql(QUESTION_QUERY, {name:  "metric" , options}),
+  )(MetricShowPresentational);
