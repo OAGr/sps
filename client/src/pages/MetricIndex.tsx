@@ -9,6 +9,8 @@ import { MeasurementForm } from "./MeasurementForm";
 import * as moment from "moment";
 import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import ReactTable from "react-table";
+import "react-table/react-table.css";
 
 const QUESTION_QUERY = gql`
 query {
@@ -48,40 +50,81 @@ query {
 `;
 const DATE_FORMAT = "YYYY";
 
+  // }, {
+  //   Header: "Age",
+  //   accessor: "age",
+  //   Cell: (props) => <span className="number">{props.value}</span>, // Custom cell components!
+  // }, {
+  //   id: "friendName", // Required because our accessor is not a string
+  //   Header: "Friend Name",
+  //   accessor: (d) => d.friend.name, // Custom value accessors!
+  // }, {
+  //   Header: (props) => <span>Friend Age</span>, // Custom header components!
+  //   accessor: "friend.age",
+  // }];
+
 const MetricIndexPresentational = (props) => {
+  const data = props.metrics.metrics;
+  const columns = [
+    {
+    Header: "Name",
+    id: "name",
+    accessor: (m) => <Link to={`/metrics/${m.id}`}>{`${m.entity.name}-${m.property.name}-${moment(m.resolvesAt).format(DATE_FORMAT)}`}</Link>,
+    sortMethod: (a, b) => {
+      return (a.props.children > b.props.children) ? 1 : -1;
+    },
+  },
+    {
+    Header: "Entity",
+    id: "entity.name", // String-based value accessors!
+    accessor: (m) => <Link to={`/entities/${m.entity.id}`}>{m.entity.name}</Link>,
+    sortMethod: (a, b) => {
+      return (a.props.children > b.props.children) ? 1 : -1;
+    },
+  },
+    {
+    Header: "Property",
+    id: "propertyName",
+    accessor: (m) => <Link to={`/properties/${m.property.abstractProperty.id}`}>{m.property.abstractProperty.name}</Link>,
+    sortMethod: (a, b) => {
+      return (a.props.children > b.props.children) ? 1 : -1;
+    },
+  },
+    {
+    Header: "Resolves At",
+    id: "metric.resolvesAa", // String-based value accessors!
+    accessor: (m) => `${moment(m.resolvesAt).format(DATE_FORMAT)}`,
+  },
+    {
+    Header: "Measurements",
+    id: "metric.resolvesAa", // String-based value accessors!
+    accessor: (m) => m.measurements.length,
+  },
+    {
+    Header: "Group Prediction",
+    id: "group-prediction", // String-based value accessors!
+    accessor: (m) => {
+      const lastMeasurement = m.measurements[m.measurements.length - 1];
+      if (lastMeasurement && lastMeasurement.aggregatedMeasurement) {
+          return lastMeasurement.aggregatedMeasurement.mean;
+      } else {
+        return "";
+      }
+    },
+  },
+    {
+    Header: "Your prediction",
+    id: "your-prediction", // String-based value accessors!
+    accessor: (m) => (<MeasurementForm metricId={m.id} />),
+  },
+];
   return (
-      <Table striped={true} bordered={true} condensed={true} hover={true}>
-        <thead>
-          <tr>
-            <th>Metric Name</th>
-            <th>Entity</th>
-            <th>Property</th>
-            <th>Resolves At</th>
-            <th>Group Prediction</th>
-            <th>Your Estimate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {(props.metrics.metrics && props.metrics.metrics.map((metric) => {
-            const lastMeasurement = metric.measurements[metric.measurements.length - 1];
-            return (
-            <tr key={metric.id}>
-              <td><Link to={`/metrics/${metric.id}`}>{`${metric.entity.name}-${metric.property.name}-${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</Link></td>
-              <td><Link to={`/entities/${metric.entity.id}`}>{metric.entity.name}</Link></td>
-              <td><Link to={`/properties/${metric.property.abstractProperty.id}`}>{metric.property.abstractProperty.name}</Link></td>
-              <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
-              <td>
-                {lastMeasurement && lastMeasurement.aggregatedMeasurement &&
-                    <div>{lastMeasurement.aggregatedMeasurement.mean}</div>
-                }
-              </td>
-              <td><MeasurementForm metricId={metric.id} /></td>
-            </tr>
-            );
-          }
-          ))}
-        </tbody>
-      </Table>
+    <div>
+        <ReactTable
+          data={data}
+          columns={columns}
+        />
+    </div>
   );
 };
 
