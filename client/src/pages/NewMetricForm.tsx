@@ -80,7 +80,6 @@ class NewMetricFormPresentational extends React.Component<any, any> {
   }
 
   public handleSubmit(event: any) {
-    // alert("A name was submitted: " + this.state.value);
     const variables = { name: this.state.name, description: this.state.description, resolvesAt: this.state.resolvesAt.toISOString() };
     this.props.createMetric({
       variables,
@@ -111,18 +110,9 @@ class NewMetricFormPresentational extends React.Component<any, any> {
   }
 }
 
-const createMetricOptions: any = {
-  update: (proxy, {data:  {createMetric} }) => {
-    const data = proxy.readQuery({query:  QUESTION_QUERY });
-    data.metrics.push({...createMetric,  measurements: [] });
-    proxy.writeQuery({query:  QUESTION_QUERY, data });
-  },
-};
-
 export const NewMetricForm = compose(
   withRouter,
   graphql(CREATE_METRIC, {
     name:  "createMetric",
-    options: createMetricOptions,
   }),
   )(NewMetricFormPresentational);

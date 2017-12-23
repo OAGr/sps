@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import ReactTable from "react-table";
 import "react-table/react-table.css";
+import * as _ from "lodash";
 
 const QUESTION_QUERY = gql`
 query {
@@ -50,18 +51,11 @@ query {
 `;
 const DATE_FORMAT = "YYYY";
 
-  // }, {
-  //   Header: "Age",
-  //   accessor: "age",
-  //   Cell: (props) => <span className="number">{props.value}</span>, // Custom cell components!
-  // }, {
-  //   id: "friendName", // Required because our accessor is not a string
-  //   Header: "Friend Name",
-  //   accessor: (d) => d.friend.name, // Custom value accessors!
-  // }, {
-  //   Header: (props) => <span>Friend Age</span>, // Custom header components!
-  //   accessor: "friend.age",
-  // }];
+function standardSort(a: any, b: any) {
+      if (!a.props) { return 1; }
+      if (!b.props) { return -1; }
+      return (a.props.children > b.props.children) ? 1 : -1;
+}
 
 const MetricIndexPresentational = (props) => {
   const data = props.metrics.metrics;
@@ -69,26 +63,20 @@ const MetricIndexPresentational = (props) => {
     {
     Header: "Name",
     id: "name",
-    accessor: (m) => <Link to={`/metrics/${m.id}`}>{`${m.entity.name}-${m.property.name}-${moment(m.resolvesAt).format(DATE_FORMAT)}`}</Link>,
-    sortMethod: (a, b) => {
-      return (a.props.children > b.props.children) ? 1 : -1;
-    },
+    accessor: (m) => <Link to={`/metrics/${m.id}`}>{m.name ? m.name : `${_.get(m, "entity.name")}-${_.get(m, "property.name")}-${moment(m.resolvesAt).format(DATE_FORMAT)}`}</Link>,
+    sortMethod: standardSort,
   },
     {
     Header: "Entity",
     id: "entity.name", // String-based value accessors!
-    accessor: (m) => <Link to={`/entities/${m.entity.id}`}>{m.entity.name}</Link>,
-    sortMethod: (a, b) => {
-      return (a.props.children > b.props.children) ? 1 : -1;
-    },
+    accessor: (m) => (m.entity ? <Link to={`/entities/${m.entity.id}`}>{m.entity.name}</Link> : ""),
+    sortMethod: standardSort,
   },
     {
     Header: "Property",
     id: "propertyName",
-    accessor: (m) => <Link to={`/properties/${m.property.abstractProperty.id}`}>{m.property.abstractProperty.name}</Link>,
-    sortMethod: (a, b) => {
-      return (a.props.children > b.props.children) ? 1 : -1;
-    },
+    accessor:  (m) => (_.has(m, "property.abstractProperty.id") ? <Link to={`/properties/${m.property.abstractProperty.id}`}>{m.property.abstractProperty.name}</Link> : ""),
+    sortMethod: standardSort,
   },
     {
     Header: "Resolves At",
@@ -97,7 +85,7 @@ const MetricIndexPresentational = (props) => {
   },
     {
     Header: "Measurements",
-    id: "metric.resolvesAa", // String-based value accessors!
+    id: "metric.measurements", // String-based value accessors!
     accessor: (m) => m.measurements.length,
   },
     {
@@ -117,7 +105,7 @@ const MetricIndexPresentational = (props) => {
     id: "your-prediction", // String-based value accessors!
     accessor: (m) => (<MeasurementForm metricId={m.id} />),
   },
-];
+  ];
   return (
     <div>
         <ReactTable

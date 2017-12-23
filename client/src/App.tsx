@@ -8,6 +8,7 @@ import { createStore, combineReducers } from "redux";
 import { EntityIndex } from "./pages/EntityIndex";
 import { EntityShow } from "./pages/EntityShow";
 import { MetricIndex } from "./pages/MetricIndex";
+import { PropertyIndex } from "./pages/PropertyIndex";
 import { MetricShow } from "./pages/MetricShow";
 import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -32,15 +33,21 @@ const Header = () => (
   <Navbar>
   <Navbar.Header>
     <Navbar.Brand>
-      <Link to="/metrics/">Simple Prediction System</Link>
+      <Link to="/properties/">Simple Prediction System</Link>
     </Navbar.Brand>
   </Navbar.Header>
   <Nav>
-    <LinkContainer to="/metrics/new">
-      <NavItem eventKey={1}>New Metric</NavItem>
+    <LinkContainer to="/properties">
+      <NavItem eventKey={1}>Properties</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/metrics">
+      <NavItem eventKey={2}>Metrics</NavItem>
     </LinkContainer>
     <LinkContainer to="/entities">
-      <NavItem eventKey={2} href="/entities">Entities</NavItem>
+      <NavItem eventKey={3} href="/entities">Entities</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/new-metric">
+      <NavItem eventKey={4}>New Metric</NavItem>
     </LinkContainer>
   </Nav>
 </Navbar>
@@ -68,8 +75,9 @@ const Routes = () => (
     <Route exact={true} path="/entities" component={EntityIndex} />
     <Route path="/entities/:entityId" component={EntityShow} />
     <Route exact={true} path="/metrics" component={MetricIndex} />
-    <Route exact={true} path="/metrics/new" component={NewMetricForm} />
-    <Route path="/metrics/:metricId" component={MetricShow} />
+    <Route exact={true} path="/new-metric" component={NewMetricForm} />
+    <Route exact={true} path="/properties" component={PropertyIndex} />
+    <Route exact={true} path="/metrics/:metricId" component={MetricShow} />
   </div>
 );
 

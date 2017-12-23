@@ -65,7 +65,7 @@ const MetricShowPresentational = (props) => {
         <tbody>
             {metric &&
             <tr>
-              <td><Link to={`/entities/${metric.entity.id}`}>{metric.entity.name}</Link>--{metric.property.name}</td>
+              <td>{metric.name ? metric.name : "foobar"}</td>
               <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
               <td>
                 {lastMeasurement && lastMeasurement.aggregatedMeasurement &&

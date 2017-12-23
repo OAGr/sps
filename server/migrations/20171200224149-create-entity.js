@@ -13,6 +13,12 @@ module.exports = {
       description: {
         type: Sequelize.TEXT
       },
+      image: {
+        type: Sequelize.STRING
+      },
+      wikipediaUrl: {
+        type: Sequelize.STRING
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE
