@@ -15,6 +15,7 @@ query GetEntityQuery($id: String!){
     entity(id: $id){
         id
         name
+        image
         properties{
           id
           name
@@ -76,7 +77,6 @@ const Property = ({ property }: any) => {
                 <thead>
                     <tr>
                         <th>Year</th>
-                        <th>Entity</th>
                         <th>Group Prediction</th>
                         <th>Your Estimate</th>
                     </tr>
@@ -137,6 +137,7 @@ class EntityShowPresentational extends React.Component<any, any> {
             <div>
                 {entity &&
                     <div>
+                        <img src={entity.image} style={{height: "100px"}}/>
                         <h2> {entity.name}</h2>
                         <Row>
                             <Col xs={3}>

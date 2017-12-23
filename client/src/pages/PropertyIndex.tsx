@@ -22,6 +22,7 @@ query {
     entity{
       id
       name
+      image
     }
     metrics{
    id 
@@ -97,6 +98,12 @@ const metricColumns = [
 const PropertyIndexPresentational = (props) => {
     const data = _.filter(props.properties.properties, (p) => !!p.abstractId);
     const columns = [
+        {
+            Header: "Entity Picture",
+            id: "entity.picture", // String-based value accessors!
+            accessor: (m) => (m.entity.image ? <img src={m.entity.image} style={{height: "30px"}}/> : ""),
+            sortMethod: standardSort,
+        },
         {
             Header: "Entity",
             id: "entity.name", // String-based value accessors!
