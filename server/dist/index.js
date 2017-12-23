@@ -1,5 +1,7 @@
 'use strict';
 
+require('babel-polyfill');
+
 var _express = require('express');
 
 var _express2 = _interopRequireDefault(_express);
