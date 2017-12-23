@@ -1,7 +1,7 @@
 import express from 'express';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
 import bodyParser from 'body-parser';
-import {schema} from './schema/index.ts';
+import {schema} from './schema/index';
 var cors = require('cors');
 
 const GRAPHQL_PORT = process.env.PORT || 8080;
