@@ -37,14 +37,14 @@ const Header = () => (
     </Navbar.Brand>
   </Navbar.Header>
   <Nav>
-    <LinkContainer to="/properties">
-      <NavItem eventKey={1}>Properties</NavItem>
-    </LinkContainer>
-    <LinkContainer to="/metrics">
-      <NavItem eventKey={2}>Metrics</NavItem>
-    </LinkContainer>
     <LinkContainer to="/entities">
       <NavItem eventKey={3} href="/entities">Entities</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/properties">
+      <NavItem eventKey={1}>Projections</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/metrics">
+      <NavItem eventKey={2}>Dates</NavItem>
     </LinkContainer>
     <LinkContainer to="/new-metric">
       <NavItem eventKey={4}>New Metric</NavItem>

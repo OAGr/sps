@@ -13,13 +13,8 @@ const ENTITY_QUERY = gql`
 query {
     entities{
         id
+        image
         name
-        properties{
-          name
-          isAbstract
-          type
-          resolvesAt
-        }
         categories{
           name
         }
@@ -34,21 +29,16 @@ const EntityIndexPresentational = (props) => {
       <Table striped={true} bordered={true} condensed={true} hover={true}>
         <thead>
           <tr>
+            <th>Image</th>
             <th>Name</th>
-            <th>Properties</th>
             <th>Categories</th>
           </tr>
         </thead>
         <tbody>
           {(props.entities.entities && props.entities.entities.map((ee) => (
             <tr key={ee.id}>
+              <td><img src={ee.image} style={{height: "70px"}} / > </td>
               <td><Link to={`/entities/${ee.id}`}>{ee.name}</Link></td>
-              <td>{ee.properties.map((p) => 
-                <div key={p.name}>
-                  {`${p.name}-${p.isAbstract}-${p.type}-${p.resolvesAt}`}
-                <br/>
-                </div>
-              )}</td>
               <td>{ee.categories.map((p) => p.name)}</td>
             </tr>
           )))}
@@ -59,5 +49,5 @@ const EntityIndexPresentational = (props) => {
 
 export const EntityIndex = compose(
     withRouter,
-    graphql(ENTITY_QUERY, { name: "entities" }),
+    graphql(ENTITY_QUERY, {name:    "entities" }),
   )(EntityIndexPresentational);
