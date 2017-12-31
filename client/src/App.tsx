@@ -14,6 +14,7 @@ import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import "react-datasheet/lib/react-datasheet.css";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });

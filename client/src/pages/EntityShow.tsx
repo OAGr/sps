@@ -7,6 +7,8 @@ import { Table, FormControl, Row, Col, ToggleButtonGroup, ToggleButton } from "r
 import * as moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 import { MeasurementForm } from "./MeasurementForm";
+import * as ReactDataSheet from "react-datasheet";
+
 import {
   LineChart,
   Line,
@@ -21,6 +23,7 @@ import {
 } from "recharts";
 import { Link } from "react-router-dom";
 import * as _ from "lodash";
+import styled from "styled-components";
 
 const ENTITY_QUERY = gql`
 query GetEntityQuery($id: String!){
@@ -72,73 +75,147 @@ const DATE_FORMAT = "YYYY";
 //     { name: "Page C", pv: 9800},
 // ];
 
-const Property = ({ property }: any) => {
-  let data = property.metrics.map((metric) => {
-    const lastMeasurement = metric.measurements[metric.measurements.length - 1];
-    let value;
-    value = lastMeasurement && lastMeasurement.aggregatedMeasurement && lastMeasurement.aggregatedMeasurement.mean || 0;
-    const name = `${moment(metric.resolvesAt).format(DATE_FORMAT)}`;
-    console.log(moment(metric.resolvesAt).unix(), moment(moment(metric.resolvesAt).unix()));
-    return { value, time: moment(metric.resolvesAt).unix() };
-  });
-  data = _.orderBy(data, (e) => (e.time));
-  console.log(data);
+const PropertyBackground = styled.div`
+  background-color: #f1f4f7;
+  padding: 10px 16px 0;
+  border-radius: 2px;
+  margin-bottom: 7px;
+  h3 {
+    font-size: 1.2em;
+    margin-top: .2em;
+  }
+`;
 
-  return (
-    <div>
-      <h3> {property.name}</h3>
-      <Table striped={true} bordered={true} condensed={true} hover={true}>
-        <thead>
-          <tr>
-            <th>Year</th>
-            <th>Group Prediction</th>
-            <th>Your Estimate</th>
-          </tr>
-        </thead>
-        <tbody>
-          {property.metrics && property.metrics.map((metric) => {
-            const lastMeasurement = metric.measurements[metric.measurements.length - 1];
-            return (
-              <tr key={metric.id}>
-                <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
-                <td>
-                  {lastMeasurement && lastMeasurement.aggregatedMeasurement &&
-                    <div>{lastMeasurement.aggregatedMeasurement.mean}</div>
-                  }
-                </td>
-                <td><MeasurementForm metricId={metric.id} /></td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </Table>
-      <ResponsiveContainer width="95%" height={150} >
-        <ScatterChart>
-          <XAxis
-            dataKey="time"
-            domain={["auto", "auto"]}
-            name="Time"
-            tickFormatter={(unixTime) => {
-              return moment(unixTime * 1000).format("YYYY");
-            }}
-            type="number"
-          />
-          <YAxis dataKey="value" name="Value" />
+const Test = styled.div`
+    display: block;
+    padding: 5px;
+    margin: auto;
+    width: 500px;
+    margin-top: 20px;
+    background-color: white;
+`;
+class Property extends React.Component<any, any> {
+  public constructor(props: any) {
+    super(props);
+    let metrics = _.orderBy(this.props.property.metrics, ((m) => moment(m.resolvesAt).unix()));
+    let data = metrics.map((metric) => {
+      const lastMeasurement = metric.measurements[metric.measurements.length - 1];
+      return ([
+        {value: `${moment(metric.resolvesAt).format(DATE_FORMAT)}`, readOnly: true},
+        {value: lastMeasurement.aggregatedMeasurement.mean, readOnly: true},
+        {value: 0, readOnly: false},
+      ]);
+    });
 
-          <Scatter
-            data={data}
-            line={{ stroke: "#777" }}
-            lineJointType="monotoneX"
-            lineType="joint"
-            name="Values"
-          />
-          <Tooltip cursor={{ strokeDasharray: "50 50" }} />
+    this.state = {
+      isOpen: true,
+      grid: [
+        [
+          {value: "Year", readOnly: true},
+          {value: "Group Prediction", readOnly: true},
+          {value: "Your Estimate", readOnly: true},
+        ],
+        ...data,
+      ],
+    };
+  }
 
-        </ScatterChart>
-      </ResponsiveContainer>
-    </div>
-  );
-};
+  public render() {
+    const { property } = this.props;
+    let metrics = _.orderBy(property.metrics, ((m) => moment(m.resolvesAt).unix()));
+    let data = metrics.map((metric) => {
+      const lastMeasurement = metric.measurements[metric.measurements.length - 1];
+      let value;
+      value = lastMeasurement && lastMeasurement.aggregatedMeasurement && lastMeasurement.aggregatedMeasurement.mean || 0;
+      const name = `${moment(metric.resolvesAt).format(DATE_FORMAT)}`;
+      console.log(moment(metric.resolvesAt).unix(), moment(moment(metric.resolvesAt).unix()));
+      return { value, time: moment(metric.resolvesAt).unix() };
+    });
+    // data = _.orderBy(data, (e) => (e.time));
+
+    return (
+      <PropertyBackground>
+        <Row>
+          <Col xs={3}>
+            <h3> {property.name}</h3>
+            <div onClick={() => { this.setState({ isOpen: !this.state.isOpen }); }}>o</div>
+          </Col>
+          <Col xs={9}>
+            <Test>
+            <ReactDataSheet
+              data={this.state.grid}
+              valueRenderer={(cell) => cell.value}
+              onChange={(cell, rowI, colJ, value) =>
+                this.setState({
+                  grid: this.state.grid.map((col) =>
+                    col.map((rowCell) =>
+                      (rowCell === cell) ? ({ value: value }) : rowCell
+                    )
+                  ),
+                })
+              }
+            />
+            </Test>
+          </Col>
+          <Col xs={9}>
+            <ResponsiveContainer width="100%" height={80} >
+              <ScatterChart>
+                <XAxis
+                  dataKey="time"
+                  domain={["auto", "auto"]}
+                  name="Time"
+                  tickFormatter={(unixTime) => {
+                    return moment(unixTime * 1000).format("YYYY");
+                  }}
+                  type="number"
+                />
+                <YAxis dataKey="value" name="Value" />
+
+                <Scatter
+                  data={data}
+                  line={{ stroke: "#777" }}
+                  lineJointType="monotoneX"
+                  lineType="joint"
+                  name="Values"
+                  isAnimationActive={false}
+                />
+                <Tooltip cursor={{ strokeDasharray: "50 50" }} />
+
+              </ScatterChart>
+            </ResponsiveContainer>
+            {this.state.isOpen &&
+              <Table striped={false} bordered={true} condensed={true} hover={true}>
+                <thead>
+                  <tr>
+                    <th>Year</th>
+                    <th>Group Prediction</th>
+                    <th>Your Estimate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {metrics && metrics.map((metric) => {
+                    const lastMeasurement = metric.measurements[metric.measurements.length - 1];
+                    return (
+                      <tr key={metric.id}>
+                        <td>{`${moment(metric.resolvesAt).format(DATE_FORMAT)}`}</td>
+                        <td>
+                          {lastMeasurement && lastMeasurement.aggregatedMeasurement &&
+                            <div>{lastMeasurement.aggregatedMeasurement.mean}</div>
+                          }
+                        </td>
+                        <td><MeasurementForm metricId={metric.id} /></td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </Table>
+            }
+          </Col>
+        </Row>
+      </PropertyBackground>
+    );
+  }
+}
 
 class EntityShowPresentational extends React.Component<any, any> {
   public constructor(props: any) {
@@ -167,21 +244,15 @@ class EntityShowPresentational extends React.Component<any, any> {
       <div>
         {entity &&
           <div>
-            <img src={entity.image} style={{ height: "100px" }} />
-            <h2> {entity.name}</h2>
             <Row>
-              <Col xs={3}>
-                <ToggleButtonGroup type="checkbox" vertical={true} value={[this.state.selectedPropertyIndex]} >
-                  {entity.properties.map((p) => (
-                    <ToggleButton value={p.id} onClick={() => this.onChange(p.id)}>
-                      {p.name}
-                    </ToggleButton>
-                  ))}
-                </ToggleButtonGroup>
+              <Col xs={2}>
+                <img src={entity.image} style={{ height: "100px" }} />
+                <h2> {entity.name}</h2>
               </Col>
-              <Col sm={9}>
-                {selectedProperty &&
-                  <Property property={selectedProperty} />
+              <Col sm={10}>
+                {entity.properties.map((p) => (
+                  <Property property={p} />
+                ))
                 }
               </Col>
             </Row>
