@@ -22,6 +22,7 @@
     "apollo-client": "^1.9.3",
     "apollo-client-preset": "0.1.0-1",
     "apollo-server-express": "^1.1.7",
+    "async": "^2.6.0",
     "babel-cli": "^6.26.0",
     "babel-preset-stage-3": "^6.24.1",
     "body-parser": "^1.18.2",

@@ -25,6 +25,7 @@
     "react-datepicker": "^0.64.0",
     "react-document-title": "^2.0.3",
     "react-dom": "^16.2.0",
+    "react-handsontable": "^0.3.1",
     "react-metrics-graphics": "https://github.com/AlexKvazos/react-metrics-graphics",
     "react-pivot": "^3.0.0",
     "react-redux": "^5.0.6",

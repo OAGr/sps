@@ -1,8 +1,9 @@
 var models = require('../models');
 import * as _ from 'lodash';
 import { resolver, attributeFields } from 'graphql-sequelize';
-import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString } from 'graphql';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from 'graphql';
 import { GraphQLBoolean } from 'graphql/type/scalars';
+import async from "async";
 
 const generateReferences = (model, references) => {
   let all = {};
@@ -61,13 +62,19 @@ let propertyType = makeObjectType(models.Property, [
 ])
 
 const defaultUserId = "edfa7c14-2b34-45c0-bad2-1c0b994dac11";
-// var i = 0;
-// setInterval(() => {
-//   var bar = models;
-//   console.log(bar)
-// 	console.log('hello world:' + i++);
-//   debugger;
-// }, 1000);
+const entityArgs = {..._.pick(attributeFields(models.Entity), ['name', 'description', 'image', 'wikipediaUrl']), ...{categoryIds: {type: new GraphQLList(GraphQLString)}}}
+
+const EntityInput = new GraphQLInputObjectType({
+  name: "entityInput",
+  fields: entityArgs
+})
+const EntityInputs = new GraphQLList(EntityInput)
+
+async function createEntity({ name, description, image, wikipediaUrl, categoryIds }){
+    const newEntity = await models.Entity.create({ name, description, image, wikipediaUrl})
+    console.log(newEntity)
+    return newEntity
+}
 
 let schema = new GraphQLSchema({
   query: new GraphQLObjectType({
@@ -117,6 +124,18 @@ let schema = new GraphQLSchema({
         resolve: async (__, { mean, metricId }) => {
           const newMetric = await models.Measurement.create({ mean, metricId, userId: defaultUserId })
           return newMetric
+        }
+      },
+      createEntity: {
+        type: entityType,
+        args: entityArgs,
+        resolve: async (__, params) => createEntity(params)
+      },
+      createEntities: {
+        type: new GraphQLList(entityType),
+        args: {entities: {type: EntityInputs}},
+        resolve: async (__, { entities }) => {
+          return await async.map(entities, createEntity)
         }
       }
     }
