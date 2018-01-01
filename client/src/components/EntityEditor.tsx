@@ -17,13 +17,21 @@ const ENTITY_QUERY = gql`
 query {
     entities {
         id
-        id
         image
         name
+        createdAt
         categories {
           name
         }
       }
+}
+`;
+
+const CREATE_ENTITIES = gql`
+mutation createEntities($entities: [entityInput]) {
+  createEntities(entities: $entities){
+    id
+  }
 }
 `;
 
@@ -51,10 +59,19 @@ export class EntityEditorPresentational extends React.Component<any, any> {
   }
 
   public save() {
+    let tableData;
     if (this.hotTable && this.hotTable.hotInstance) {
-      const foobar = this.hotTable.hotInstance.getData();
-      console.log("??", foobar);
+      tableData = this.hotTable.hotInstance.getData();
     }
+    tableData = tableData.map((d) => ({
+      id: d[0],
+      image: d[2],
+      name: d[3],
+      category: d[4],
+    }));
+    const newData = tableData.filter( (d) => !d.id);
+    const variables = {entities: newData.map((d) => _.pick(d, ["image", "name"]))};
+    this.props.createEntities({variables});
   }
 
   public prepareData() {
@@ -64,10 +81,11 @@ export class EntityEditorPresentational extends React.Component<any, any> {
         id: e.id,
         image: e.image,
         name: e.name,
-        category: e.categories && e.categories[0].name,
+        createdAt: e.createdAt,
+        category: e.categories && e.categories[0] && e.categories[0].name,
       });
     }) || [];
-    fData = [...fData, ..._.times(1, _.constant(null)).map((e) => ({}))];
+    fData = [...fData, ..._.times(50, _.constant(null)).map((e) => ({}))];
     return fData;
   }
 
@@ -76,6 +94,10 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     return [
       {
         data: "id",
+        readOnly: true,
+      },
+      {
+        data: "createdAt",
         readOnly: true,
       },
       {
@@ -128,4 +150,5 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 export const EntityEditor = compose(
   graphql(ENTITY_QUERY, { name: "entities" }),
   graphql(CATEGORIES_QUERY, { name: "categories" }),
+  graphql(CREATE_ENTITIES, { name: "createEntities" }),
   )(EntityEditorPresentational);

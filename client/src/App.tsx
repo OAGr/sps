@@ -7,6 +7,7 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { createStore, combineReducers } from "redux";
 import { EntityIndex } from "./pages/EntityIndex";
 import { EntityShow } from "./pages/EntityShow";
+import { EntityEdit } from "./pages/EntityEdit";
 import { MetricIndex } from "./pages/MetricIndex";
 import { PropertyIndex } from "./pages/PropertyIndex";
 import { MetricShow } from "./pages/MetricShow";
@@ -74,6 +75,7 @@ const LandingPage = () => (
 const Routes = () => (
   <div>
     <Route exact={true} path="/entities" component={EntityIndex} />
+    <Route exact={true} path="/new-entities" component={EntityEdit} />
     <Route path="/entities/:entityId" component={EntityShow} />
     <Route exact={true} path="/metrics" component={MetricIndex} />
     <Route exact={true} path="/new-metric" component={NewMetricForm} />

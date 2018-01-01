@@ -71,8 +71,15 @@ const EntityInput = new GraphQLInputObjectType({
 const EntityInputs = new GraphQLList(EntityInput)
 
 async function createEntity({ name, description, image, wikipediaUrl, categoryIds }){
-    const newEntity = await models.Entity.create({ name, description, image, wikipediaUrl})
-    console.log(newEntity)
+    let newEntity = await models.Entity.create({ name, description, image, wikipediaUrl})
+    await async.map(categoryIds, async (id) => {
+     const category = await models.Category.findById(id)
+     if (category) {
+       await models.EntityCategory.create({ entityId: newEntity.id, categoryId: id })
+     }
+    })
+
+    newEntity = await models.Entity.findById(newEntity.id)
     return newEntity
 }
 

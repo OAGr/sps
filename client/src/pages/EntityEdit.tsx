@@ -9,13 +9,14 @@ import { Link } from "react-router-dom";
 import * as moment from "moment";
 import "react-datepicker/dist/react-datepicker.css";
 import { EntityTable } from "../components/EntityTable";
+import { EntityEditor } from "../components/EntityEditor";
 
 const EntityIndexPresentational = (props) => {
   return (
-    <EntityTable/>
+    <EntityEditor/>
   );
 };
 
-export const EntityIndex = compose(
+export const EntityEdit = compose(
     withRouter,
   )(EntityIndexPresentational);
