@@ -71,7 +71,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     }));
     const newData = tableData.filter( (d) => !d.id);
     const variables = {entities: newData.map((d) => _.pick(d, ["image", "name"]))};
-    this.props.createEntities({variables});
+    // this.props.createEntities({variables});
   }
 
   public prepareData() {

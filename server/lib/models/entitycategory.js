@@ -17,6 +17,20 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.UUID,
       allowNull: false
     }
+  }, {
+    hooks: {
+      beforeCreate: async(entityCategory, options) => {
+        const category = await entityCategory.getCategory()
+        const abstractProperties = await category.getProperties();
+        for (let _property of abstractProperties) {
+          await sequelize.models.Property.create({ entityId: entityCategory.entityId, abstractId: _property.id, isAbstract: false })
+        }
+      }
+    }
   });
+  EntityCategory.associate = function (models) {
+    EntityCategory.Category = EntityCategory.belongsTo(models.Category, {foreignKey: 'categoryId'})
+    EntityCategory.Entity = EntityCategory.belongsTo(models.Entity, {foreignKey: 'entityId'})
+  }
   return EntityCategory;
 };

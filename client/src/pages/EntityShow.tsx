@@ -102,7 +102,7 @@ class Property extends React.Component<any, any> {
       const lastMeasurement = metric.measurements[metric.measurements.length - 1];
       return ([
         {value: `${moment(metric.resolvesAt).format(DATE_FORMAT)}`, readOnly: true},
-        {value: lastMeasurement.aggregatedMeasurement.mean, readOnly: true},
+        {value: lastMeasurement && lastMeasurement.aggregatedMeasurement.mean, readOnly: true},
         {value: 0, readOnly: false},
       ]);
     });

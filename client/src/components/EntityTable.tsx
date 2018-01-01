@@ -52,7 +52,7 @@ const EntityTablePresentational = (props) => {
   let fData = data && data.map((e) => {
     return ({
       image: e.image,
-      imageHtml: `<img src=${e.image} style="height: 30px">`,
+      imageHtml: !!e.image ? `<img src=${e.image} style="height: 30px">` : "",
       name: `<a href="/entities/${e.id}">${e.name}</a>`,
       categories: e.categories.map((c) => c.name).join(""),
     });
