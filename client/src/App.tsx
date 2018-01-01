@@ -16,6 +16,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import "react-datasheet/lib/react-datasheet.css";
+import { PropertyEdit } from "./pages/PropertyEdit";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -75,12 +76,13 @@ const LandingPage = () => (
 const Routes = () => (
   <div>
     <Route exact={true} path="/entities" component={EntityIndex} />
-    <Route exact={true} path="/new-entities" component={EntityEdit} />
     <Route path="/entities/:entityId" component={EntityShow} />
     <Route exact={true} path="/metrics" component={MetricIndex} />
-    <Route exact={true} path="/new-metric" component={NewMetricForm} />
     <Route exact={true} path="/properties" component={PropertyIndex} />
     <Route exact={true} path="/metrics/:metricId" component={MetricShow} />
+    <Route exact={true} path="/admin/entities/edit" component={EntityEdit} />
+    <Route exact={true} path="/admin/metrics/new" component={NewMetricForm} />
+    <Route exact={true} path="/admin/properties/edit" component={PropertyEdit} />
   </div>
 );
 
