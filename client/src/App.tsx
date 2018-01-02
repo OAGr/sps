@@ -17,6 +17,7 @@ import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import "react-datasheet/lib/react-datasheet.css";
 import { PropertyEdit } from "./pages/PropertyEdit";
+import { CategoryNew } from "./pages/CategoryNew";
 
 const { SERVER_URL } = process.env;
 // const networkInterface = createNetworkInterface({ uri: process.env.REACT_APP_SERVER_URL });
@@ -32,29 +33,61 @@ const store = createStore(
   reduxDevtoolsMiddleware
 );
 
-const Header = () => (
+const AdminHeader = () => {
+  return (
   <Navbar>
   <Navbar.Header>
     <Navbar.Brand>
-      <Link to="/properties/">Simple Prediction System</Link>
+      <Link to="/properties/">Admin Section</Link>
+    </Navbar.Brand>
+  </Navbar.Header>
+  <Nav>
+    <LinkContainer to="/admin/entities/edit">
+      <NavItem eventKey={2}>Entities</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/admin/properties/edit">
+      <NavItem eventKey={1}>Categories</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/admin/metrics/new">
+      <NavItem eventKey={4}>New Metric</NavItem>
+    </LinkContainer>
+    <LinkContainer to="/admin/categories/new">
+      <NavItem eventKey={4}>New Category</NavItem>
+    </LinkContainer>
+  </Nav>
+</Navbar>
+  );
+};
+
+const ViewingHeader = () => {
+  return (
+  <Navbar>
+  <Navbar.Header>
+    <Navbar.Brand>
+      <Link to="/entities">Simple Prediction System</Link>
     </Navbar.Brand>
   </Navbar.Header>
   <Nav>
     <LinkContainer to="/entities">
       <NavItem eventKey={3} href="/entities">Entities</NavItem>
     </LinkContainer>
-    <LinkContainer to="/properties">
-      <NavItem eventKey={1}>Projections</NavItem>
-    </LinkContainer>
     <LinkContainer to="/metrics">
-      <NavItem eventKey={2}>Dates</NavItem>
-    </LinkContainer>
-    <LinkContainer to="/new-metric">
-      <NavItem eventKey={4}>New Metric</NavItem>
+      <NavItem eventKey={2}>Metrics</NavItem>
     </LinkContainer>
   </Nav>
 </Navbar>
-);
+  );
+};
+
+const Header = () => {
+  const adminTest = /\/admin\//;
+  const isAdmin = adminTest.test(window.location.href);
+  if (isAdmin) {
+    return (<AdminHeader/> );
+  } else {
+    return (<ViewingHeader/> );
+  }
+};
 
 export class Layout extends React.Component {
   public render() {
@@ -83,6 +116,7 @@ const Routes = () => (
     <Route exact={true} path="/admin/entities/edit" component={EntityEdit} />
     <Route exact={true} path="/admin/metrics/new" component={NewMetricForm} />
     <Route exact={true} path="/admin/properties/edit" component={PropertyEdit} />
+    <Route exact={true} path="/admin/categories/new" component={CategoryNew} />
   </div>
 );
 

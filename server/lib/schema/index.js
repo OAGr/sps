@@ -83,6 +83,15 @@ async function createEntity({ name, description, image, wikipediaUrl, categoryId
     return newEntity
 }
 
+async function upsert(model, params){
+  if (params.id) {
+    const result = await model.update(params, {where: {id: params.id}, returning: true})
+    return result[1][0];
+  } else {
+    return await model.create(params)
+  }
+}
+
 let schema = new GraphQLSchema({
   query: new GraphQLObjectType({
     name: 'RootQueryType',
@@ -144,7 +153,17 @@ let schema = new GraphQLSchema({
         resolve: async (__, { entities }) => {
           return await async.map(entities, createEntity)
         }
-      }
+      },
+      upsertCategory: {
+        type: categoryType,
+        args: {..._.pick(attributeFields(models.Category), ['name']), id: {type: GraphQLString}},
+        resolve: async (__, params) => upsert(models.Category, params)
+      },
+      upsertProperty: {
+        type: propertyType,
+        args: {..._.pick(attributeFields(models.Property), ['name', 'categoryId', 'entityId', 'resolvesAt']), id: {type: GraphQLString}},
+        resolve: async (__, params) => upsert(models.Property, params)
+      },
     }
   })
 });
