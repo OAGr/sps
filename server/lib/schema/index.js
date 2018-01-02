@@ -3,7 +3,8 @@ import * as _ from 'lodash';
 import { resolver, attributeFields } from 'graphql-sequelize';
 import { GraphQLObjectType, GraphQLNonNull, GraphQLFloat, GraphQLList, GraphQLSchema, GraphQLInt, GraphQLString, GraphQLInputObjectType } from 'graphql';
 import { GraphQLBoolean } from 'graphql/type/scalars';
-import async from "async";
+import * as aasync from "async";
+// console.log(aasync)
 
 const generateReferences = (model, references) => {
   let all = {};
@@ -61,6 +62,7 @@ let propertyType = makeObjectType(models.Property, [
   ['abstractProperty', () => propertyType, 'AbstractProperty'],
 ])
 
+// ENTITY -------------------------------
 const defaultUserId = "edfa7c14-2b34-45c0-bad2-1c0b994dac11";
 const entityArgs = {..._.pick(attributeFields(models.Entity), ['name', 'description', 'image', 'wikipediaUrl']), ...{categoryIds: {type: new GraphQLList(GraphQLString)}}}
 
@@ -72,16 +74,25 @@ const EntityInputs = new GraphQLList(EntityInput)
 
 async function createEntity({ name, description, image, wikipediaUrl, categoryIds }){
     let newEntity = await models.Entity.create({ name, description, image, wikipediaUrl})
-    await async.map(categoryIds, async (id) => {
+    return await Promise.all(categoryIds.map(async id => {
      const category = await models.Category.findById(id)
      if (category) {
        await models.EntityCategory.create({ entityId: newEntity.id, categoryId: id })
      }
-    })
+    }))
 
     newEntity = await models.Entity.findById(newEntity.id)
     return newEntity
 }
+
+// Property -------------------------------
+const propertyArgs = {..._.pick(attributeFields(models.Property), ['name', 'categoryId', 'entityId', 'resolvesAt'])}
+const PropertyInput = new GraphQLInputObjectType({
+  name: "propertyInput",
+  fields: propertyArgs
+})
+
+const PropertyInputs = new GraphQLList(PropertyInput)
 
 async function upsert(model, params){
   if (params.id) {
@@ -90,6 +101,17 @@ async function upsert(model, params){
   } else {
     return await model.create(params)
   }
+}
+
+async function upsertt(model, params){
+  let result
+  if (params.id) {
+    result = await model.update(params, {where: {id: params.id}, returning: true})
+    result = result[1][0];
+  } else {
+    result = await model.create(params)
+  }
+  return result
 }
 
 let schema = new GraphQLSchema({
@@ -151,7 +173,7 @@ let schema = new GraphQLSchema({
         type: new GraphQLList(entityType),
         args: {entities: {type: EntityInputs}},
         resolve: async (__, { entities }) => {
-          return await async.map(entities, createEntity)
+          return await Promise.all(entities.map(e => createEntity(e)))
         }
       },
       upsertCategory: {
@@ -164,6 +186,13 @@ let schema = new GraphQLSchema({
         args: {..._.pick(attributeFields(models.Property), ['name', 'categoryId', 'entityId', 'resolvesAt']), id: {type: GraphQLString}},
         resolve: async (__, params) => upsert(models.Property, params)
       },
+      upsertProperties: {
+        type: new GraphQLList(propertyType),
+        args: {properties: {type: PropertyInputs}},
+        resolve: async (__, { properties }) => {
+          return await Promise.all(properties.map(p => upsert(models.Property, p)))
+        }
+      }
     }
   })
 });

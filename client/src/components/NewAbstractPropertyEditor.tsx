@@ -24,7 +24,6 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     this.hotTable = null;
     this.save = this.save.bind(this);
     this.prepareData = this.prepareData.bind(this);
-    this.prepareData = this.prepareData.bind(this);
   }
 
   public save() {
@@ -44,44 +43,16 @@ export class EntityEditorPresentational extends React.Component<any, any> {
   }
 
   public prepareData() {
-    const data = this.props.properties;
-    let fData: any = data && data.map((e) => {
-      return ({
-        id: e.id,
-        name: e.name,
-        category: e.category.name,
-      });
-    }) || [];
-    fData = [...fData, ..._.times(50, _.constant(null)).map((e) => ({}))];
-    return fData;
-  }
-
-  // --->
-  public prepareDataa() {
-    const properties = this.props.properties;
-    let fData: any = properties && properties.map((e) => {
-      let row: any = {};
-      row.id = e.id;
-      row.name = e.name;
-      e.resolvesAt.map((time, index) => {
-        row[`t${index}`] = moment(time).format("MM/YYYY");
-      });
-      return row;
-    }) || [];
-    fData = [...fData, ..._.times(10, _.constant(null)).map((e) => ({}))];
-    return fData;
+    console.log(_.times(this.props.extraRows, _.constant(null)).map((e) => ({})));
+    return _.times(this.props.extraRows, _.constant(null)).map((e) => ({}));
   }
 
   public prepareColumns() {
     return [
       {
-        data: "id",
-        readOnly: true,
-      },
-      {
         data: "name",
       },
-      ..._.times(20, _.constant(null)).map((e, i) => ({
+      ..._.times(this.props.extraColumns, _.constant(null)).map((e, i) => ({
         data: `t${i}`,
         type: "date",
         dateFormat: "MM/YYYY",
@@ -91,38 +62,33 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 
   public prepareColumnHeaders() {
     return [
-      "id",
       "name",
-      ..._.times(20, _.constant(null)).map((e, i) => `t${i}`),
+      ..._.times(this.props.extraColumns, _.constant(null)).map((e, i) => `t${i + 1}`),
     ];
   }
 
   public render() {
     return (
-      <div>
-        {this.props.properties &&
-          <HotTable
-            root={"foobar"}
-            ref={(node) => this.hotTable = node}
-            data={this.prepareDataa()}
-            colHeaders={this.prepareColumnHeaders()}
-            rowHeaders={true}
-            width="1200"
-            height="1200"
-            stretchH="all"
-            columns={this.prepareColumns()}
-            columnSorting={true}
-            sortIndicator={true}
-            manualRowMove={true}
-            onAfterChange={(changes, source) => {
-              // console.log(changes, source);
-            }}
-          />
-        }
-      </div>
+      <HotTable
+        root={"new-properties"}
+        ref={(node) => this.hotTable = node}
+        data={this.prepareData()}
+        colHeaders={this.prepareColumnHeaders()}
+        rowHeaders={true}
+        width={this.props.width}
+        height={this.prepareData().length * 24 + 24}
+        stretchH="all"
+        columns={this.prepareColumns()}
+        columnSorting={true}
+        sortIndicator={true}
+        manualRowMove={true}
+        onAfterChange={(changes, source) => {
+          // console.log(changes, source);
+        }}
+      />
     );
   }
 }
 
-export const AbstractPropertyEditor: any = compose(
+export const NewAbstractPropertyEditor: any = compose(
   )(EntityEditorPresentational);
