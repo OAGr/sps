@@ -14,8 +14,8 @@ import * as _ from "lodash";
 import * as HotTable from "react-handsontable";
 
 const CREATE_ENTITIES = gql`
-mutation createEntities($entities: [entityInput]) {
-  createEntities(entities: $entities){
+mutation upsertEntities($entities: [entityInput]) {
+  upsertEntities(entities: $entities){
     id
   }
 }
@@ -47,7 +47,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     }));
     const newData = tableData.filter( (d) => !!d.name);
     const variables = {entities: newData.map((d) => _.pick(d, ["image", "name", "categoryIds"]))};
-    this.props.createEntities({variables});
+    this.props.upsertEntities({variables});
   }
 
   public prepareData() {
@@ -97,5 +97,5 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 }
 
 export const NewEntityEditor: any = compose(
-  graphql(CREATE_ENTITIES, { name: "createEntities" }),
+  graphql(CREATE_ENTITIES, { name: "upsertEntities" }),
   )(EntityEditorPresentational);

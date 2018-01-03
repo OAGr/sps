@@ -64,7 +64,11 @@ let propertyType = makeObjectType(models.Property, [
 
 // ENTITY -------------------------------
 const defaultUserId = "edfa7c14-2b34-45c0-bad2-1c0b994dac11";
-const entityArgs = {..._.pick(attributeFields(models.Entity), ['name', 'description', 'image', 'wikipediaUrl']), ...{categoryIds: {type: new GraphQLList(GraphQLString)}}}
+const entityArgs = {
+  ..._.pick(attributeFields(models.Entity), ['name', 'description', 'image', 'wikipediaUrl']), 
+  ...{categoryIds: {type: new GraphQLList(GraphQLString)}},
+  id: {type: GraphQLString},
+}
 
 const EntityInput = new GraphQLInputObjectType({
   name: "entityInput",
@@ -74,15 +78,23 @@ const EntityInputs = new GraphQLList(EntityInput)
 
 async function createEntity({ name, description, image, wikipediaUrl, categoryIds }){
     let newEntity = await models.Entity.create({ name, description, image, wikipediaUrl})
-    return await Promise.all(categoryIds.map(async id => {
-     const category = await models.Category.findById(id)
-     if (category) {
-       await models.EntityCategory.create({ entityId: newEntity.id, categoryId: id })
-     }
+    await Promise.all((categoryIds || []).map(async id => {
+       const category = await models.Category.findById(id)
+       if (category) {
+         await models.EntityCategory.create({ entityId: newEntity.id, categoryId: id })
+       }
     }))
 
-    newEntity = await models.Entity.findById(newEntity.id)
-    return newEntity
+    return await models.Entity.findById(newEntity.id)
+    // return newEntity
+}
+
+async function upsertEntity(params){
+  if (params.id){
+    return await updateModel(models.Entity, params)
+  } else {
+    return await createEntity(params)
+  }
 }
 
 // Property -------------------------------
@@ -94,24 +106,17 @@ const PropertyInput = new GraphQLInputObjectType({
 
 const PropertyInputs = new GraphQLList(PropertyInput)
 
-async function upsert(model, params){
-  if (params.id) {
+async function updateModel(model, params){
     const result = await model.update(params, {where: {id: params.id}, returning: true})
     return result[1][0];
+}
+
+async function upsert(model, params){
+  if (params.id) {
+    return await updateModel(model, params)
   } else {
     return await model.create(params)
   }
-}
-
-async function upsertt(model, params){
-  let result
-  if (params.id) {
-    result = await model.update(params, {where: {id: params.id}, returning: true})
-    result = result[1][0];
-  } else {
-    result = await model.create(params)
-  }
-  return result
 }
 
 let schema = new GraphQLSchema({
@@ -164,12 +169,12 @@ let schema = new GraphQLSchema({
           return newMetric
         }
       },
-      createEntity: {
+      upsertEntity: {
         type: entityType,
         args: entityArgs,
-        resolve: async (__, params) => createEntity(params)
+        resolve: async (__, params) => await upsertEntity(params)
       },
-      createEntities: {
+      upsertEntities: {
         type: new GraphQLList(entityType),
         args: {entities: {type: EntityInputs}},
         resolve: async (__, { entities }) => {
@@ -179,12 +184,12 @@ let schema = new GraphQLSchema({
       upsertCategory: {
         type: categoryType,
         args: {..._.pick(attributeFields(models.Category), ['name']), id: {type: GraphQLString}},
-        resolve: async (__, params) => upsert(models.Category, params)
+        resolve: async (__, params) => await upsert(models.Category, params)
       },
       upsertProperty: {
         type: propertyType,
         args: {..._.pick(attributeFields(models.Property), ['name', 'categoryId', 'entityId', 'resolvesAt']), id: {type: GraphQLString}},
-        resolve: async (__, params) => upsert(models.Property, params)
+        resolve: async (__, params) => await upsert(models.Property, params)
       },
       upsertProperties: {
         type: new GraphQLList(propertyType),

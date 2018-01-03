@@ -28,8 +28,8 @@ query {
 `;
 
 const CREATE_ENTITIES = gql`
-mutation createEntities($entities: [entityInput]) {
-  createEntities(entities: $entities){
+mutation upsertEntities($entities: [entityInput]) {
+  upsertEntities(entities: $entities){
     id
   }
 }
@@ -71,7 +71,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     }));
     const newData = tableData.filter( (d) => !d.id);
     const variables = {entities: newData.map((d) => _.pick(d, ["image", "name"]))};
-    // this.props.createEntities({variables});
+    // this.props.upsertEntities({variables});
   }
 
   public prepareData() {
@@ -150,5 +150,5 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 export const EntityEditor = compose(
   graphql(ENTITY_QUERY, { name: "entities" }),
   graphql(CATEGORIES_QUERY, { name: "categories" }),
-  graphql(CREATE_ENTITIES, { name: "createEntities" }),
+  graphql(CREATE_ENTITIES, { name: "upsertEntities" }),
   )(EntityEditorPresentational);
