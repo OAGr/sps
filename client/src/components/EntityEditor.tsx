@@ -119,7 +119,6 @@ export class EntityEditorPresentational extends React.Component<any, any> {
   public render() {
     const data = this.prepareData();
     const columns = this.prepareColumns();
-    console.log(data, columns);
     return (
       <div>
         <HotTable

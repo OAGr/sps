@@ -94,13 +94,13 @@ async function createEntity({ name, description, image, wikipediaUrl, categoryId
 }
 
 async function upsertEntity(params){
+  console.log("TRYING TO UPSERT", params)
   if (params.id){
     return await updateModel(models.Entity, params)
   } else {
     return await createEntity(params)
   }
 }
-
 
 let categoryType = makeObjectType(models.Category, [
   ['entities', () => new GraphQLList(entityType), 'Entities'],
@@ -125,6 +125,7 @@ const PropertyInputs = new GraphQLList(PropertyInput)
 
 function standardUpserts(name, existingAttributes, type){
   const modelName = models[Case.sentence(name)]
+  const pluralName = pluralize.plural(name);
   const objectArgs = {
     ..._.pick(attributeFields(modelName), existingAttributes),
     id: {type: GraphQLString},
@@ -145,11 +146,13 @@ function standardUpserts(name, existingAttributes, type){
   }
 
   let pluralArgs = {};
-  pluralArgs[pluralize.plural(name)] = {type: multipleInput}
-  upserts[`upsert${Case.sentence(pluralize.plural(name))}`] = {
+  pluralArgs[pluralName] = {type: multipleInput}
+  upserts[`upsert${Case.sentence(pluralName)}`] = {
     type: new GraphQLList(type),
     args: pluralArgs,
-    resolve: async (__, params) => await upsert(modelName, params)
+    resolve: async (__, params) => {
+      return await Promise.all(params[pluralName].map(e => upsert(modelName, e)))
+    }
   }
   return upserts
 }
@@ -216,7 +219,7 @@ let schema = new GraphQLSchema({
         type: new GraphQLList(entityType),
         args: {entities: {type: EntityInputs}},
         resolve: async (__, { entities }) => {
-          return await Promise.all(entities.map(e => createEntity(e)))
+          return await Promise.all(entities.map(e => upsertEntity(e)))
         }
       },
       ...propertyMutations,

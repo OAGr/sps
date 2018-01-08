@@ -16,6 +16,15 @@ import * as HotTable from "react-handsontable";
 const DATE_FORMAT = "YYYY";
 
 let hotTable;
+
+const CREATE_PROPERTIES = gql`
+mutation upsertProperties($properties: [propertyInput]) {
+  upsertProperties(properties: $properties){
+    id
+  }
+}
+`;
+
 export class EntityEditorPresentational extends React.Component<any, any> {
   public hotTable;
 
@@ -31,14 +40,17 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     if (this.hotTable && this.hotTable.hotInstance) {
       tableData = this.hotTable.hotInstance.getData();
     }
-    tableData = tableData.map((d) => ({
-      id: d[0],
-      image: d[2],
-      name: d[3],
-      category: d[4],
-    }));
-    const newData = tableData.filter((d) => !d.id);
-    const variables = { entities: newData.map((d) => _.pick(d, ["image", "name"])) };
+    tableData = tableData.filter((row) => !_.isEmpty(row[0])).map((d) => {
+      const resolvesAt = _.filter(d.splice(1, d.length), (e) => !!e).map((date) => moment(date, "MM/YYYY").toDate());
+      return ({
+        name: d[0],
+        resolvesAt,
+        categoryId: this.props.categoryId,
+      });
+    });
+    // const newData = tableData.filter((d) => !d.id);
+    const variables = { properties: tableData };
+    this.props.createCategory({variables});
   }
 
   public prepareData() {
@@ -68,6 +80,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 
   public render() {
     return (
+      <div>
       <HotTable
         root={"new-properties"}
         ref={(node) => this.hotTable = node}
@@ -85,9 +98,16 @@ export class EntityEditorPresentational extends React.Component<any, any> {
           // console.log(changes, source);
         }}
       />
+        <Button onClick={this.save}>
+          SAVE
+            </Button>
+      </div>
     );
   }
 }
 
 export const NewAbstractPropertyEditor: any = compose(
+  graphql(CREATE_PROPERTIES, {
+    name:  "createCategory",
+  }),
   )(EntityEditorPresentational);

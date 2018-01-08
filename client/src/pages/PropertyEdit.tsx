@@ -84,7 +84,7 @@ export class EntityIndexPresentational extends React.Component<any, any> {
           <ExistingAbstractPropertyEditor properties={properties} extraRows={0} extraColumns={5} width={containerWidth}/>
         }
         {this.state.chosenNavItem === "4" &&
-          <NewAbstractPropertyEditor extraRows={10} extraColumns={20} width={containerWidth}/>
+          <NewAbstractPropertyEditor extraRows={10} extraColumns={20} width={containerWidth} categoryId={category.id}/>
         }
       </div>
     );

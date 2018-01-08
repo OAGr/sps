@@ -13,7 +13,7 @@ import "react-table/react-table.css";
 import * as _ from "lodash";
 import * as HotTable from "react-handsontable";
 
-const CREATE_ENTITIES = gql`
+const UPSERT_ENTITIES = gql`
 mutation upsertEntities($entities: [entityInput]) {
   upsertEntities(entities: $entities){
     id
@@ -23,7 +23,6 @@ mutation upsertEntities($entities: [entityInput]) {
 
 const DATE_FORMAT = "YYYY";
 
-let hotTable;
 const ccolumnHeaders = ["id", "createdAt", "image", "name"];
 export class EntityEditorPresentational extends React.Component<any, any> {
   public hotTable;
@@ -31,24 +30,9 @@ export class EntityEditorPresentational extends React.Component<any, any> {
   public constructor(props: any) {
     super(props);
     this.hotTable = null;
-    this.save = this.save.bind(this);
     this.prepareData = this.prepareData.bind(this);
     this.prepareData = this.prepareData.bind(this);
-  }
-
-  public save() {
-    let tableData;
-    if (this.hotTable && this.hotTable.hotInstance) {
-      tableData = this.hotTable.hotInstance.getData();
-    }
-    tableData = tableData.map((d) => ({
-      id: d[0],
-      image: d[2],
-      name: d[3],
-    }));
-    const newData = tableData.filter( (d) => !d.id);
-    const variables = {entities: newData.map((d) => _.pick(d, ["image", "name"]))};
-    // this.props.upsertEntities({variables});
+    this.handleChange = this.handleChange.bind(this);
   }
 
   public prepareData() {
@@ -83,6 +67,23 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     ];
   }
 
+  public handleChange(changeData: any, type: any) {
+    if (type === "edit" || type === "CopyPaste.paste") {
+      let tableData;
+      if (this.hotTable && this.hotTable.hotInstance) {
+        tableData = this.hotTable.hotInstance.getData();
+      }
+      const rows = changeData.map((e) => {
+        const row = tableData[e[0]];
+        return ({
+          id: row[0],
+          [e[1]]: e[3],
+        });
+      });
+      this.props.upsertEntities({variables: {entities: rows}});
+    }
+  }
+
   public render() {
     const data = this.prepareData();
     const columns = this.prepareColumns();
@@ -101,18 +102,13 @@ export class EntityEditorPresentational extends React.Component<any, any> {
           columnSorting={true}
           sortIndicator={true}
           manualRowMove={true}
-          onAfterChange={(changes, source) => {
-            console.log(changes, source);
-          }}
+          onAfterChange={this.handleChange}
         />
-        <Button onClick={this.save}>
-          SAVE
-            </Button>
       </div>
     );
   }
 }
 
 export const ExistingEntityEditor: any = compose(
-  graphql(CREATE_ENTITIES, { name: "upsertEntities" }),
+  graphql(UPSERT_ENTITIES, { name: "upsertEntities" }),
   )(EntityEditorPresentational);

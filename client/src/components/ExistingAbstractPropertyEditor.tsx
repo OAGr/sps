@@ -15,30 +15,21 @@ import * as HotTable from "react-handsontable";
 
 const DATE_FORMAT = "YYYY";
 
-let hotTable;
+const UPSERT_PROPERTIES = gql`
+mutation upsertProperties($properties: [propertyInput]) {
+  upsertProperties(properties: $properties){
+    id
+  }
+}
+`;
 export class EntityEditorPresentational extends React.Component<any, any> {
   public hotTable;
 
   public constructor(props: any) {
     super(props);
     this.hotTable = null;
-    this.save = this.save.bind(this);
     this.prepareData = this.prepareData.bind(this);
-  }
-
-  public save() {
-    let tableData;
-    if (this.hotTable && this.hotTable.hotInstance) {
-      tableData = this.hotTable.hotInstance.getData();
-    }
-    tableData = tableData.map((d) => ({
-      id: d[0],
-      image: d[2],
-      name: d[3],
-      category: d[4],
-    }));
-    const newData = tableData.filter((d) => !d.id);
-    const variables = { entities: newData.map((d) => _.pick(d, ["image", "name"])) };
+    this.handleChange = this.handleChange.bind(this);
   }
 
   public prepareData() {
@@ -54,6 +45,23 @@ export class EntityEditorPresentational extends React.Component<any, any> {
     }) || [];
     fData = [...fData, ..._.times(this.props.extraRows, _.constant(null)).map((e) => ({}))];
     return fData;
+  }
+
+  public handleChange(changeData: any, type: any) {
+    if (type === "edit" || type === "CopyPaste.paste") {
+      let tableData;
+      if (this.hotTable && this.hotTable.hotInstance) {
+        tableData = this.hotTable.hotInstance.getData();
+      }
+      const rows = changeData.map((e) => {
+        const row = tableData[e[0]];
+        return ({
+          id: row[0],
+          [e[1]]: e[3],
+        });
+      });
+      this.props.upsertProperties({variables: {properties: rows}});
+    }
   }
 
   public prepareColumns() {
@@ -88,7 +96,11 @@ export class EntityEditorPresentational extends React.Component<any, any> {
         {this.props.properties &&
           <HotTable
             root={"existing-table"}
-            ref={(node) => this.hotTable = node}
+            ref={(node) => {
+              this.hotTable = node;
+              console.log("DECLARITNG", node, this.hotTable);
+            }}
+
             data={this.prepareData()}
             colHeaders={this.prepareColumnHeaders()}
             rowHeaders={true}
@@ -99,9 +111,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
             columnSorting={true}
             sortIndicator={true}
             manualRowMove={true}
-            onAfterChange={(changes, source) => {
-              // console.log(changes, source);
-            }}
+            onAfterChange={this.handleChange}
           />
         }
       </div>
@@ -110,4 +120,7 @@ export class EntityEditorPresentational extends React.Component<any, any> {
 }
 
 export const ExistingAbstractPropertyEditor: any = compose(
+  graphql(UPSERT_PROPERTIES, {
+    name:  "upsertProperties",
+  }),
   )(EntityEditorPresentational);

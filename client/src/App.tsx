@@ -7,11 +7,9 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { createStore, combineReducers } from "redux";
 import { EntityIndex } from "./pages/EntityIndex";
 import { EntityShow } from "./pages/EntityShow";
-import { EntityEdit } from "./pages/EntityEdit";
 import { MetricIndex } from "./pages/MetricIndex";
 import { PropertyIndex } from "./pages/PropertyIndex";
 import { MetricShow } from "./pages/MetricShow";
-import { NewMetricForm } from "./pages/NewMetricForm";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
@@ -42,14 +40,8 @@ const AdminHeader = () => {
     </Navbar.Brand>
   </Navbar.Header>
   <Nav>
-    <LinkContainer to="/admin/entities/edit">
-      <NavItem eventKey={2}>Entities</NavItem>
-    </LinkContainer>
     <LinkContainer to="/admin/properties/edit">
       <NavItem eventKey={1}>Categories</NavItem>
-    </LinkContainer>
-    <LinkContainer to="/admin/metrics/new">
-      <NavItem eventKey={4}>New Metric</NavItem>
     </LinkContainer>
     <LinkContainer to="/admin/categories/new">
       <NavItem eventKey={4}>New Category</NavItem>
@@ -113,8 +105,6 @@ const Routes = () => (
     <Route exact={true} path="/metrics" component={MetricIndex} />
     <Route exact={true} path="/properties" component={PropertyIndex} />
     <Route exact={true} path="/metrics/:metricId" component={MetricShow} />
-    <Route exact={true} path="/admin/entities/edit" component={EntityEdit} />
-    <Route exact={true} path="/admin/metrics/new" component={NewMetricForm} />
     <Route exact={true} path="/admin/properties/edit" component={PropertyEdit} />
     <Route exact={true} path="/admin/categories/new" component={CategoryNew} />
   </div>
